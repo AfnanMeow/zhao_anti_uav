@@ -23,10 +23,10 @@ class AntiUavTrack1Val(unittest.TestCase, DemoCompatibilityCheck):
     def setUp(self) -> None:
         self.task = Tasks.video_single_object_tracking
         self.model_id = 'damo/cv_alex_video-single-object-tracking_siamfc'
-        val_set = MsDataset.load('3rd_Anti-UAV', namespace='ly261666', split='validation')
-        assert val_set is not None, 'test set should be downloaded first'
+        #val_set = MsDataset.load('3rd_Anti-UAV', namespace='ly261666', split='validation')
+        #assert val_set is not None, 'test set should be downloaded first'
         # set own path
-        self.dataset_dir = '/home/ly261666/.cache/modelscope/hub/datasets/ly261666/3rd_Anti-UAV/master/data_files/extracted/7b8a88c5a8f38cced25ee619b96d924c0eea9f033bb57fc160ca2ec004d1ee6f/validation'
+        self.dataset_dir = 'C:/Users/T25301039/Documents/CVPR_Anti_UAV/3rd_Anti-UAV_train_val/validation'
         self.visulization = False
 
     def iou(self, bbox1, bbox2):
@@ -84,7 +84,7 @@ class AntiUavTrack1Val(unittest.TestCase, DemoCompatibilityCheck):
 
     @unittest.skipUnless(test_level() >= 1, 'skip test in current test level')
     def test_run_with_dataset(self):
-        video_paths = glob.glob(os.path.join(self.dataset_dir, '*'))
+        video_paths = sorted([p for p in glob.glob(os.path.join(self.dataset_dir, '*')) if os.path.isdir(p)])
         video_num = len(video_paths)
         overall_performance = []
         mode = 'IR'
@@ -93,6 +93,7 @@ class AntiUavTrack1Val(unittest.TestCase, DemoCompatibilityCheck):
         # run tracking experiments and report performance
         for video_id, video_path in enumerate(video_paths, start=1):
             uav_tracker = pipeline(self.task, model=self.model_id)
+            uav_tracker.model.load_pretrain('C:/Users/T25301039/Documents/CVPR_Anti_UAV/workdirs/siamfc_got10k/latest_ckpt.pth')
             tracker = uav_tracker.model
             output_dir = os.path.join('results', tracker.tracker_name + '_{got10k}')
             if not os.path.exists(output_dir):
