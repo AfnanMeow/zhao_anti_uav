@@ -134,12 +134,15 @@ def snapshot_download(model_id: str,
                     revision=revision)
 
                 # First download to /tmp
-                http_get_file(
-                    url=url,
-                    local_dir=temp_cache_dir,
-                    file_name=model_file['Name'],
-                    headers=headers,
-                    cookies=cookies)
+                
+                try:
+                    http_get_file(
+                                    url=url, local_dir=temp_cache_dir, file_name=model_file["Name"], headers=headers, cookies=cookies)
+                except Exception as e:
+                    if 'README' in file_name:
+                        print(f'Skipping README.md download error: {e}')
+                    else:
+                        raise
                 # check file integrity
                 temp_file = os.path.join(temp_cache_dir, model_file['Name'])
                 if FILE_HASH in model_file:

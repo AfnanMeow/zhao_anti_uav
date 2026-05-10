@@ -79,8 +79,8 @@ def _geometric_aug_func(x,
                 translate,
                 scale,
                 shear,
-                resample=2,
-                fillcolor=tuple([int(i) for i in pixel_mean]))
+                interpolation=transforms.InterpolationMode.NEAREST,
+                fill=0 )
             x_crop = transforms.functional.to_tensor(x_crop).to(x.device)
         x_crops.append(x_crop)
     y = _transform(x, x_crops, boxes_crops, translate)

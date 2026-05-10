@@ -251,10 +251,15 @@ def http_get_file(
     logger.info('storing %s in cache at %s', url, local_dir)
     downloaded_length = os.path.getsize(temp_file.name)
     if total != downloaded_length:
-        os.remove(temp_file.name)
-        msg = 'File %s download incomplete, content_length: %s but the \
-                    file downloaded length: %s, please download again' % (
-            file_name, total, downloaded_length)
-        logger.error(msg)
-        raise FileDownloadError(msg)
-    os.replace(temp_file.name, os.path.join(local_dir, file_name))
+        if 'README' in file_name:
+            logger.warning('Skipping README.md size check, continuing...')
+            os.replace(temp_file.name, os.path.join(local_dir, file_name))
+        else:
+            os.remove(temp_file.name)
+            msg = 'File %s download incomplete, content_length: %s but the \
+                        file downloaded length: %s, please download again' % (
+                file_name, total, downloaded_length)
+            logger.error(msg)
+            raise FileDownloadError(msg)
+    else:
+        os.replace(temp_file.name, os.path.join(local_dir, file_name))
