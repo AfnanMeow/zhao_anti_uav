@@ -1,0 +1,42 @@
+{
+  "DRL (ours)": {
+    "TP": 98,
+    "FP": 2,
+    "FN": 0,
+    "TN": 0,
+    "Precision": 0.98,
+    "Recall": 1.0,
+    "F1": 0.98989898989899,
+    "Accuracy": 0.98
+  },
+  "Uniform": {
+    "TP": 99,
+    "FP": 1,
+    "FN": 0,
+    "TN": 0,
+    "Precision": 0.99,
+    "Recall": 1.0,
+    "F1": 0.9949748743718593,
+    "Accuracy": 0.99
+  },
+  "Exponential": {
+    "TP": 98,
+    "FP": 2,
+    "FN": 0,
+    "TN": 0,
+    "Precision": 0.98,
+    "Recall": 1.0,
+    "F1": 0.98989898989899,
+    "Accuracy": 0.98
+  },
+  "Arithmetic": {
+    "TP": 100,
+    "FP": 0,
+    "FN": 0,
+    "TN": 0,
+    "Precision": 1.0,
+    "Recall": 1.0,
+    "F1": 1.0,
+    "Accuracy": 1.0
+  }
+}

@@ -50,6 +50,8 @@ class Detector(TorchModel):
             state_dict = ckpt['model']
         elif 'state_dict' in ckpt:
             state_dict = ckpt['state_dict']
+        else:
+            state_dict = ckpt    
         logger.info(f'Finetune from {pretrain_model}................')
         new_state_dict = {}
         for k, v in self.state_dict().items():
