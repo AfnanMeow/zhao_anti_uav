@@ -1,0 +1,52 @@
+# =============================================================================
+# Keep the repository to source, results (JSON), figures and documents.
+# Everything regenerable or enormous is excluded.
+# =============================================================================
+
+# ── cached features and shards (~36 GB, rebuildable) ─────────────────────────
+# fl_workdirs/clear      rebuild with:  python stage1_clear.py        (~3 min)
+# fl_workdirs/stage1     rebuild with:  python stage1_public_pretrain.py
+#                                       python stage1b_recache.py
+# fl_workdirs/bigdata    rebuild with:  python build_bigdata_shards.py
+fl_workdirs/**
+!fl_workdirs/
+!fl_workdirs/*.json
+
+# ── datasets ─────────────────────────────────────────────────────────────────
+3rd_Anti-UAV_train_val/
+data/
+single_test_coco/
+
+# ── environments, caches, build ──────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ── model weights and archives ───────────────────────────────────────────────
+*.pth
+*.pt
+*.onnx
+*.rar
+*.zip
+*.tar
+*.tar.gz
+modelscope/
+DRL_Nets/
+
+# ── vendored third-party trees ───────────────────────────────────────────────
+yolov5/
+
+# ── run logs (regenerable; findings are captured in the FINDINGS_*.md files) ──
+*.log
+
+# ── OS / editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

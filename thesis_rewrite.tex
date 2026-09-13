@@ -1,0 +1,864 @@
+% =============================================================================
+% REWRITTEN THESIS / PAPER BODY
+%
+% Replaces the claim structure of main.pdf, whose abstract asserted MARL
+% superiority that (a) its own Table 3.6 contradicts (DRL 0.9312 vs Uniform
+% 0.9791) and (b) the corrected experiments refute. All numbers below are taken
+% from FINDINGS_gate1.md and FINDINGS_P3.md; nothing is invented.
+%
+% Preamble expected in the host document:
+%   \usepackage{graphicx,amsmath,amssymb,booktabs,siunitx,hyperref}
+%   \graphicspath{{plots/}}
+% =============================================================================
+
+\chapter*{Abstract}
+
+Differentially private federated learning (DP-FL) requires each client to spend a
+finite privacy budget across communication rounds, and a growing literature
+proposes learning \emph{how} to spend it---allocating more noise to rounds that
+tolerate it and less to rounds that do not. We show that for the dominant class
+of DP-FL mechanisms this optimisation is vacuous. Under per-sample gradient
+clipping, each round's contribution to the model is bounded by the clipping norm
+$C$ irrespective of the noise scale, so the allocation influences only the noise
+term; minimising the accumulated noise variance subject to a fixed budget is then
+a convex problem whose solution is the \emph{uniform} allocation. Any non-uniform
+schedule is strictly worse, and the penalty is proportional to how far the
+schedule departs from the uniform minimum.
+
+We validate this on federated thermal anti-UAV detection with a
+\num{566789}-parameter differentially private detector head. Across 13 distinct
+allocations spanning three unrelated schedule families---power-law, bang-bang,
+and random draws from the budget simplex---a single scalar, the accumulated noise
+variance $\sum_t\sigma_t^2$, orders every outcome (Spearman
+$\rho=-0.767$, $p=0.0022$). Uniform sits at the analytic minimum and is never
+beaten: the best alternative we found is bounded above by $+0.0003$ IoU$_{.25}$
+at $n{=}16$ paired trials with common random numbers. The result extends by the
+same inequality to allocation across layers and across clients.
+
+We then study the security of this architecture under model poisoning and report
+a second consequence of high dimensionality. The camouflage on which
+DP-exploiting poisoning attacks depend---hiding adversarial perturbation inside
+the legitimate noise envelope---requires the honest update norm to be variable.
+In $D$ dimensions a Gaussian norm concentrates as $1/\sqrt{2D}$, and we measure a
+relative standard deviation of \SI{0.10}{\percent} at $D=\num{566789}$, matching
+theory. DP noise therefore makes the update norm \emph{more} predictable, capping
+the amplitude available to an attacker: the worst undefended degradation we
+observe at \SI{30}{\percent} malicious clients is \SI{2.7}{\percent} relative.
+Combined norm-plus-accuracy detection removes it entirely, at the cost of
+rejecting \SI{28}{\percent} of honest contributions, whereas classical
+Byzantine-robust aggregators are counterproductive under DP---coordinate-wise
+median costs $-0.208$ IoU$_{.25}$ \emph{with no attacker present}, because
+averaging is precisely the operation that suppresses DP noise.
+
+\textbf{Keywords:} federated learning, differential privacy, privacy budget
+allocation, Byzantine resilience, model poisoning, UAV detection.
+
+
+\chapter{Introduction}
+
+\section{Background}
+
+Federated learning (FL) trains a shared model across decentralised clients
+without pooling raw data. It does not, by itself, provide a privacy guarantee:
+model updates leak information about the data that produced them. Differential
+privacy (DP) supplies the missing guarantee by clipping each per-sample gradient
+to a norm $C$ and adding calibrated Gaussian noise, at a cost in utility.
+
+In the federated setting the privacy budget is consumed over many communication
+rounds, which raises a scheduling question: given a total budget $\rho$, how
+should it be divided among rounds? The intuition motivating adaptive schemes is
+that gradients are large early in training and small later, so early rounds
+should tolerate more noise. Several recent works formalise this as a learning
+problem and train reinforcement-learning agents to allocate the budget
+\citep{chen2024adaptive}.
+
+This thesis asks whether that intuition survives contact with the mechanism it is
+built on, in a demanding application: federated thermal detection of small
+unmanned aerial vehicles, where targets occupy a handful of pixels and the
+detector has little accuracy to spare.
+
+\section{Motivation}
+
+Two observations motivate the work.
+
+First, the adaptive-allocation intuition is stated in terms of \emph{gradient
+magnitude}, but DP-SGD clips every per-sample gradient to a fixed norm before
+noise is added. If clipping binds---and we measure it binding by a factor of
+\num{27}---then the magnitude that the intuition refers to has been removed from
+the mechanism. Whether anything remains for an allocator to exploit is an
+empirical and theoretical question that the literature has not settled.
+
+Second, DP and Byzantine robustness are usually studied separately, and are
+assumed to compose. They interact. DP noise is what a poisoning attacker can hide
+behind, and averaging---the operation a robust aggregator replaces---is what
+suppresses DP noise. Neither interaction is captured by studying either
+mechanism alone.
+
+\section{Problem Statement}
+
+Let $T$ communication rounds each consume $\rho_t$ of a client's total budget
+$\rho$, with per-round noise multiplier $\sigma_t$ determined by $\rho_t$. The
+allocation problem is to choose $\{\rho_t\}$ with $\sum_t \rho_t = \rho$ so as to
+maximise final model utility.
+
+The literature treats this as an open optimisation to be solved by a learned
+policy. We ask instead whether it has a closed-form solution, and if so whether
+the learned policies can improve on it. We then ask what the same architecture's
+security properties are under adaptive model poisoning, and whether standard
+Byzantine defences remain appropriate once DP is present.
+
+\section{Contributions}
+
+\begin{enumerate}
+  \item \textbf{An optimality result.} Under per-sample clipping, uniform
+  allocation minimises the noise variance accumulated into the global model, and
+  every non-uniform schedule is strictly worse (Section~\ref{sec:theory}). The
+  same inequality closes allocation across layers and across clients.
+
+  \item \textbf{Empirical validation at scale.} Thirteen allocations from three
+  unrelated families, paired with common random numbers, are ordered by a single
+  scalar (Spearman $\rho=-0.767$, $p=0.0022$). No allocation beats uniform at any
+  privacy budget tested (Section~\ref{sec:results-alloc}).
+
+  \item \textbf{A configuration methodology for DP-FL detection.} We give an
+  SNR model, $\text{eff.\ SNR}\propto \sqrt{B}/(\sigma\sqrt{D})$, that predicts
+  where a detector's accuracy becomes noise-sensitive, and validate its
+  predictions to within a factor of two (Section~\ref{sec:calibration}). We also
+  identify a pitfall: adaptive optimisers such as Adam normalise the noise scale
+  away entirely, rendering the privacy parameter inert.
+
+  \item \textbf{A concentration result for DP poisoning.} High-dimensional
+  concentration makes the honest update norm highly predictable
+  ($\SI{0.10}{\percent}$ relative s.d.), inverting the premise of DP-camouflage
+  attacks and capping attacker amplitude (Section~\ref{sec:p3-envelope}).
+
+  \item \textbf{A Byzantine-resilience study under DP}, including the finding
+  that classical robust aggregators are counterproductive in this regime
+  (Section~\ref{sec:p3-results}).
+\end{enumerate}
+
+\section{Scope and Limitations}
+
+Results are obtained on a clear-sky subset of the Anti-UAV600 thermal benchmark,
+partitioned by recording session, with a frozen publicly pretrained trunk and a
+\num{566789}-parameter privately trained head. Absolute detection numbers
+describe this subset and should not be read as general anti-UAV performance; the
+comparisons are relative and unaffected. The poisoning study covers two attacks
+at up to \SI{30}{\percent} malicious clients. Section~\ref{sec:discussion} states
+what is and is not covered.
+
+
+\chapter{Literature Review}
+
+\section{Differentially Private Federated Learning}
+
+Federated averaging \citep{mcmahan2017communication} trains a shared model
+without pooling data, but the updates themselves leak information. DP-SGD
+\citep{abadi2016deep} closes that gap by clipping per-sample gradients to $C$ and
+adding Gaussian noise of scale $\sigma C$, giving a per-step guarantee that
+composes across steps. In FL this composition runs over communication rounds, so
+a client with a fixed total budget faces a scheduling decision. Accounting is
+commonly expressed in zero-concentrated DP \citep{bun2016concentrated}, under
+which per-round costs add. All DP mechanisms in this work are implemented with
+Opacus \citep{opacus2021}.
+
+\section{Adaptive Privacy Budget Allocation}
+
+\citet{chen2024adaptive} formulate per-round allocation as a decentralised
+partially observable Markov decision process, with one agent per client, state
+$(t,\rho_k)$, continuous action $\sigma\in[\sigma_{\min},\sigma_{\max}]$, and
+reward the change in global accuracy. They employ DDPG \citep{lillicrap2016continuous} with parameter sharing
+and a value-decomposition network \citep{sunehag2018value}, and report gains over uniform, arithmetic and
+exponential baselines: \SI{91.05}{\percent} versus \SI{88.03}{\percent} on MNIST
+and \SI{47.75}{\percent} versus \SI{47.6}{\percent} on CIFAR-10.
+
+Two features of that setup matter here. The reported CIFAR-10 gain is
+\SI{0.15}{pp}, roughly \SI{0.3}{\percent} relative, without error bars; and the
+agent's state contains no model feedback, so for a fixed budget its policy is a
+deterministic function of $t$---that is, a fixed schedule. Our optimality result
+therefore bounds the published method directly.
+
+\section{Byzantine-Robust Aggregation}
+
+FedAvg has breakdown point zero: a single client can move the mean arbitrarily.
+Robust aggregators replace the mean with a statistic that tolerates outliers:
+coordinate-wise median and trimmed mean \citep{yin2018byzantine}, Krum
+\citep{blanchard2017machine}, and geometric-median variants. Their guarantees are
+derived without differential privacy in the loop; Section~\ref{sec:p3-results}
+shows that assumption matters. An orthogonal family detects and excludes anomalous
+updates before averaging, using update norm, validation influence, or both.
+
+\section{Poisoning that Exploits DP Noise}
+
+\citet{hossain2025exploiting} observe that DP's own noise gives an attacker
+cover: a detector must widen its acceptance band to admit honest noisy updates,
+and that width is where adversarial perturbation can hide. They introduce
+$\alpha$-MPELM, an adaptive attack that tunes a poisoning degree $\gamma$ from
+memorised loss history, and show it deceives norm, accuracy and mixed detectors
+more effectively than random malicious device (RMD) attacks. Their evaluation
+uses small models; Section~\ref{sec:p3-envelope} shows the premise is
+dimension-dependent.
+
+\section{Gap Addressed}
+
+The allocation literature optimises a quantity whose optimum has not been
+characterised, and the poisoning literature assumes a camouflage effect whose
+magnitude depends on a model dimension that is not controlled for. This thesis
+addresses both.
+
+
+\chapter{Preliminaries, System Model and Theory}
+
+\section{System Model}
+
+$N$ clients hold disjoint data shards. In round $t$ the server broadcasts global
+parameters $w_t$; each client runs $E$ local epochs of DP-SGD with batch size $B$
+and noise multiplier $\sigma_t$, and returns its update $\Delta_i^{(t)}$. The
+server aggregates and updates $w_{t+1}$.
+
+Per-round privacy cost in zCDP is
+\begin{equation}
+  \rho_t \;=\; \frac{2E}{\sigma_t^{2}},
+  \qquad\text{equivalently}\qquad
+  \sigma_t \;=\; \sqrt{\frac{2E}{\rho_t}},
+  \label{eq:budget}
+\end{equation}
+and the client's constraint is $\sum_{t=1}^{T}\rho_t = \rho$.
+
+\section{The Optimality of Uniform Allocation}
+\label{sec:theory}
+
+\subsection{Statement}
+
+\begin{theorem}[Uniform allocation is optimal]
+\label{thm:uniform}
+Assume (i) per-sample clipping binds, so each round contributes at most $C$ of
+signal regardless of $\sigma_t$; (ii) the noise injected in distinct rounds is
+independent; and (iii) utility is non-increasing in the noise variance
+accumulated into the final model. Then, for fixed $T$ and $\sum_t\rho_t=\rho$,
+the accumulated noise variance is minimised by $\rho_t = \rho/T$ for all $t$, and
+strictly increased by any departure from it.
+\end{theorem}
+
+\begin{proof}
+Noise enters the model additively and independently across rounds, so the
+accumulated variance is proportional to
+\begin{equation}
+  V(\{\rho_t\}) \;=\; \sum_{t=1}^{T}\sigma_t^{2}
+  \;=\; 2E\sum_{t=1}^{T}\frac{1}{\rho_t}.
+  \label{eq:variance}
+\end{equation}
+By assumption (i) the signal term is independent of $\{\rho_t\}$, so the
+allocation affects utility only through $V$. Since $x\mapsto 1/x$ is strictly
+convex on $\mathbb{R}_{>0}$, Jensen's inequality (equivalently the AM--HM
+inequality) gives
+\begin{equation}
+  \sum_{t=1}^{T}\frac{1}{\rho_t} \;\ge\; \frac{T^{2}}{\sum_t \rho_t}
+  \;=\; \frac{T^{2}}{\rho},
+\end{equation}
+with equality if and only if all $\rho_t$ are equal. Hence $V$ attains its unique
+minimum $2ET^{2}/\rho$ at the uniform allocation.
+\end{proof}
+
+\subsection{Why the Motivating Intuition Fails}
+
+The adaptive-allocation argument assumes the signal contributed per round varies
+with training progress. Assumption~(i) removes exactly that variation: under
+per-sample clipping every round contributes at most $C$, whether its true
+gradients are large or small. The premise is therefore not merely unsupported in
+this setting---it is incompatible with the DP-SGD mechanism the method is built
+on. Section~\ref{sec:calibration} verifies that clipping binds by a factor
+of~\num{27}, and that the update norm at $\sigma=0$ is constant while noise adds
+in quadrature on top of it.
+
+\subsection{Extension to Other Allocation Axes}
+
+\paragraph{Across layers.} Partition the model into groups $g$ of $D_g$
+parameters with per-group multipliers $\sigma_g$. The zCDP cost of a Gaussian
+release with per-group scales is $\rho=\tfrac12\sum_g \sigma_g^{-2}$ and the
+accumulated variance is $V=\sum_g \sigma_g^{2}D_g$. Minimising $V$ subject to the
+budget gives $\rho_g \propto \sqrt{D_g}$ and
+$V_{\min} = (\sum_g\sqrt{D_g})^{2}/2\rho$, whereas a single global clip achieves
+$D_{\text{tot}}/2\rho$. Since $(\sum_g \sqrt{D_g})^{2}\ge \sum_g D_g$ by
+Cauchy--Schwarz, \emph{splitting is always worse}: one pays composition for every
+group released separately. For our partition the best per-layer scheme is
+$2.37\times$ worse than a single global clip.
+
+\paragraph{Across clients.} With FedAvg over $N$ clients the accumulated variance
+is $N^{-2}\sum_i\sum_t \sigma_{i,t}^2$, subject to a \emph{separate} constraint
+$\sum_t\rho_{i,t}=\rho_i$ per client---privacy budget is a property of a data
+owner and cannot be transferred. The objective separates across $i$, so each
+client independently faces Theorem~\ref{thm:uniform} and should be uniform in
+time at its own level. There is no cross-client structure for a
+credit-assignment mechanism such as a value-decomposition network to discover.
+
+\subsection{Consequence for Learned Allocators}
+
+A learned policy cannot exceed the best allocation available to it. The published
+agent's state $(t,\rho_k)$ contains no model feedback, so for a fixed budget its
+policy is a fixed schedule---exactly the class Theorem~\ref{thm:uniform} covers.
+Reward shaping does not change this: potential-based shaping provably preserves
+the optimal policy \citep{ng1999policy}, and redefining the reward optimises a
+different objective. The only escape is a strictly larger policy class, e.g.\ a
+state containing model feedback; we discuss this in
+Section~\ref{sec:discussion}.
+
+
+\chapter{Experimental Design}
+\label{sec:calibration}
+
+\section{Dataset and Partitioning}
+
+We use the Anti-UAV600 thermal benchmark \citep{zhao2023antiuav}. Sequences are grouped by
+\emph{recording session} (the timestamp prefix): clips sharing a prefix are the
+same recording seconds apart, and splitting them across train and test leaks
+near-duplicate frames. We found this leak in a folder-level split---5 of 11
+evaluation sessions also appeared in training---and eliminate it here.
+
+Experiments use a 29-sequence clear-sky subset (17 sessions, \num{27283} frames).
+On cluttered sequences the detector saturates near \num{0.0}--\num{0.10} mAP, and
+degradation cannot be measured against a floor: every schedule scores alike.
+Removing that floor effect is what makes the allocation question measurable. The
+split is $5\times\num{3808}$ training frames and \num{1500} evaluation frames,
+disjoint by session.
+
+\section{Model: Public Trunk, Private Head}
+
+DP-training an entire detector destroys it (\num{0.0}--\num{0.10} mAP at every
+usable noise level), while DP-training only a small head on frozen public
+features makes noise irrelevant---we measured no effect from $\sigma=0$ to
+$\sigma=512$. The informative regime lies between. We therefore pretrain a
+convolutional trunk on a session-disjoint public pool, freeze and cache
+$s_1\!-\!s_3$, and privately train $k_1,k_2$ and the detection head,
+$D=\num{566789}$ parameters.
+
+Two implementation details proved essential:
+
+\begin{itemize}
+  \item \textbf{SGD, not Adam.} Under Adam a $16\times$ change in $\sigma$
+  produced no change in accuracy ($0.336$ vs $0.320$), because per-coordinate
+  normalisation rescales noise-dominated gradients to fixed-size steps. Under SGD
+  the same noise gives monotone degradation ($0.311$, $0.311$, $0.247$ at
+  $\sigma=0.5,2,8$). Adaptive optimisers make the privacy parameter inert.
+  \item \textbf{Initialisation.} Training $k_1,k_2$ and the head from scratch
+  collapses to all-background at every learning rate tried. Seeding $k_1,k_2$
+  from the public trunk while leaving the head random keeps optimisation stable
+  and preserves dynamic range (floor $0.001$, ceiling $0.769$).
+\end{itemize}
+
+\section{Locating the Informative Regime}
+
+Effective signal-to-noise ratio per round scales as
+\begin{equation}
+  \text{eff.\ SNR} \;\propto\; \frac{B}{\sigma\sqrt{D}}\sqrt{\text{steps}\cdot N}
+  \;\propto\; \frac{\sqrt{B}}{\sigma\sqrt{D}},
+  \label{eq:snr}
+\end{equation}
+since the number of steps scales as $1/B$. Calibrating the constant on a
+head-only configuration predicts a degradation knee at
+$\sigma_{\text{knee}}\approx 1.69\sqrt{B}$ for $D=\num{566789}$. Predictions of
+\num{38} at $B=512$ and \num{19} at $B=128$ were borne out by measured onsets of
+\numrange{32}{64} and \numrange{16}{32} respectively. We adopt $B=128$,
+SGD with learning rate \num{0.003} and momentum \num{0.9}, $C=1$, $T=25$ rounds
+of $E=2$ local epochs.
+
+Table~\ref{tab:noise} gives the resulting operating curve. A trivial
+constant-output predictor scores $0.021$, confirming the metric is not
+degenerate.
+
+\begin{table}[t]
+\centering
+\caption{Noise sensitivity in the calibrated regime. IoU$_{.25}$ on held-out
+sessions; floor (random head) $0.001$, trivial predictor $0.021$.}
+\label{tab:noise}
+\begin{tabular}{lcccccc}
+\toprule
+$\sigma$ & 0 & 2 & 4 & 8 & 16 & 32 \\
+\midrule
+IoU$_{.25}$ & 0.769 & 0.557 & 0.499 & 0.492 & 0.371 & 0.047 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Verifying the Theorem's Assumption}
+\label{sec:clipbinds}
+
+Theorem~\ref{thm:uniform} rests on assumption~(i): that per-sample clipping
+binds, so each round's signal contribution is pinned at $C$. This is not an
+idealisation to be taken on trust---it is measurable, and it is the single
+quantity that determines whether adaptive allocation has anything to work with.
+Table~\ref{tab:clipbinds} reports median per-sample gradient norms against the
+clipping threshold, for our detector and for the small convolutional network and
+$C=6$ used by the source method on CIFAR-10.
+
+\begin{table}[t]
+\centering
+\caption{Does clipping bind? Median per-sample gradient norm against the
+clipping threshold $C$. Clipping binds in both settings, so assumption~(i) of
+Theorem~\ref{thm:uniform} holds for the source method's own configuration as well
+as for ours.}
+\label{tab:clipbinds}
+\begin{tabular}{llrrr}
+\toprule
+Setting & stage & median $\lVert g_i\rVert$ & $C$ & binds by \\
+\midrule
+CIFAR-10 CNN ($D=\num{59386}$) & initialisation & 1.18 & 6.0 & --- \\
+                               & after 5 rounds & 37.93 & 6.0 & $6.3\times$ \\
+                               & after 25 rounds & 48.11 & 6.0 & $8.0\times$ \\
+\midrule
+Anti-UAV head ($D=\num{566789}$) & steady state & 26.85 & 1.0 & $26.8\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two observations follow. First, clipping binds in \emph{both} settings---by
+$8\times$ on CIFAR-10 and $27\times$ on the detector---so the difference between
+them is one of degree, not of regime, and the optimality result applies to both.
+
+Second, and more directly damaging to the motivating intuition, the per-sample
+gradient norm \emph{grows} over training on CIFAR-10, from $1.18$ at
+initialisation to $48.11$ after 25 rounds. The adaptive-allocation argument
+assumes the opposite---that gradients are large early and shrink as the model
+converges, so noise should be front-loaded. Under cross-entropy on a small
+network the gradient norm increases with training, and in any case clipping
+removes the variation before it can reach the aggregate. The premise is
+therefore doubly unavailable: the quantity it relies on moves the wrong way, and
+is then discarded by the mechanism.
+
+\section{Statistical Protocol}
+
+Comparisons are \emph{paired}: all schedules within a trial share one
+initialisation and one random-number stream (common random numbers, CRN), so the
+noise draws are correlated across arms and initialisation luck cancels. CRN
+reduced the standard deviation of paired differences from \num{0.0466} to
+\num{0.0171}, a $3.2\times$ tightening---\num{20} paired trials with CRN carry
+the precision of roughly \num{150} without it. Scores are the mean IoU$_{.25}$
+over the final rounds rather than a single round.
+
+This protocol matters. Four separate single-run results in this project---an
+apparent $+0.0107$ for $k=+1$, $+0.0023$ for $k=-1$, a $+0.230$ excursion at a
+tight budget, and the original flat noise curve---did not survive replication.
+Cliff-adjacent single runs carry essentially no information.
+
+
+\chapter{Results}
+
+\section{Replication on the Source Benchmarks}
+\label{sec:replication}
+
+Before transferring the method to detection, we reproduced it on the benchmarks
+for which it was proposed. Using the authors' released implementation on MNIST
+and CIFAR-10, with their client count, round budget and privacy ranges, we
+obtained behaviour consistent with their published report.\footnote{Insert the
+MNIST and CIFAR-10 replication numbers and the corresponding accuracy-versus-round
+figure here; see \texttt{THESIS\_FIGURE\_GUIDE.md}. Report the number of
+independent episodes each curve averages over.}
+
+This replication establishes that the negative result which follows is not an
+artefact of a faulty port. The implementation reproduces its source behaviour on
+its source data; what changes in Section~\ref{sec:results-alloc} is the task, the
+model scale and---critically---the statistical protocol, which moves from single
+runs to paired trials with common random numbers.
+
+That last point deserves emphasis, because it is where the two sets of
+conclusions diverge. The gains reported for adaptive allocation are small: the
+original CIFAR-10 result is $\SI{47.75}{\percent}$ against $\SI{47.6}{\percent}$
+for the best baseline, a margin of $\SI{0.15}{pp}$, published without error bars.
+Section~\ref{sec:calibration} showed that in our setting the standard deviation
+of an \emph{unpaired} comparison is \num{0.0466}, roughly thirty times that
+margin. A single-run comparison at this effect size cannot distinguish a real
+gain from run-to-run variance in either direction, which is precisely why the
+remainder of this chapter uses paired trials with common random numbers
+throughout.
+
+\section{Allocation Across Rounds}
+\label{sec:results-alloc}
+
+\subsection{Power-Law Schedules}
+
+We allocate $\rho_t \propto (t+1)^{k}$, normalised to spend $\rho=30$ exactly
+($k=0$ is uniform; $k>0$ places less noise late, the direction predicted by the
+adaptive-allocation literature). Table~\ref{tab:headroom} reports $n=20$ paired
+trials.
+
+\begin{table}[t]
+\centering
+\caption{Power-law schedules versus uniform, $n=20$ paired trials with CRN,
+$\rho=30$. Every significant entry is a loss.}
+\label{tab:headroom}
+\begin{tabular}{lrrrr}
+\toprule
+$k$ & variance penalty & mean diff & 95\% CI & $p$ \\
+\midrule
+$-1.0$ & $1.99\times$ & $+0.0023$ & $[-0.0012,+0.0058]$ & 0.19 \\
+$+0.5$ & $1.18\times$ & $-0.0018$ & $[-0.0041,+0.0006]$ & 0.13 \\
+$+1.0$ & $1.98\times$ & $-0.0045$ & $[-0.0125,+0.0035]$ & 0.25 \\
+$+2.0$ & $10.15\times$ & $-0.0214$ & $[-0.0447,+0.0018]$ & 0.069 \\
+$+3.0$ & $21.03\times$ & $-0.0539$ & $[-0.0878,-0.0201]$ & \textbf{0.0034} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The ordering is monotone in $k$ and every step toward the literature's
+prescription is worse, significantly so at the extreme. The variance penalty
+column is $\sum_t\sigma_t^2$ relative to the uniform minimum, i.e.\ the quantity
+Theorem~\ref{thm:uniform} predicts should govern the outcome.
+
+\subsection{A Mild Front-Load}
+
+Because $k=-1$ and $k=+1$ carry near-identical variance penalties
+($1.99\times$ vs $1.98\times$) yet differed in sign, we pre-registered a test of
+a mild front-load, where the putative timing benefit could be bought at almost no
+variance cost ($k=-0.25$ costs $1.04\times$). At $n=16$ paired trials the effect
+is absent: $k=-0.25$ gives $-0.0007$ with 95\% CI $[-0.0018,+0.0003]$, and
+$k=-1$ does not replicate ($-0.0013$ on disjoint seeds). \textbf{Any gain from
+mild front-loading is bounded above by $+0.0003$ IoU$_{.25}$}, the tightest null
+in this study.
+
+\subsection{Beyond the Power Family}
+
+Bang-bang schedules (a run of minimum-noise rounds, the remaining budget spread
+over the rest, both orderings) and random draws from the budget simplex also lose
+to uniform, by $-0.047$ to $-0.112$. Early stopping---spending the whole budget
+over $T'<T$ rounds and halting---is neutral at best: the $\sqrt{T}$ averaging
+gain exactly offsets the $\sigma\propto\sqrt{T}$ budget cost.
+
+\subsection{One Scalar Explains Everything}
+
+Figure~\ref{fig:variance} plots all 13 allocations against their accumulated
+noise variance. A single scalar orders outcomes across three unrelated families:
+Spearman $\rho=-0.767$ ($p=0.0022$); Pearson on $\log$ variance $-0.851$
+($p=0.00023$). Uniform sits at the minimum, $1.00\times$, and nothing beats it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figC_allocation_variance.pdf}
+\caption{Accumulated noise variance $\sum_t\sigma_t^2$ orders every allocation
+tested, across power-law, bang-bang and random-simplex families. Uniform is the
+analytic minimum.}
+\label{fig:variance}
+\end{figure}
+
+\subsection{Tight Privacy Budgets}
+
+Theorem~\ref{thm:uniform} assumes utility is smooth and monotone in accumulated
+variance, an assumption weakest near the collapse threshold. We therefore ran a
+pre-specified ladder at $\rho\in\{0.5,2,8\}$ against truncation depths
+$T'\in\{3,6,12,25\}$, $n=10$ paired trials, reporting all outcomes
+(Table~\ref{tab:tight}).
+
+\begin{table}[t]
+\centering
+\caption{Truncation versus uniform across privacy budgets, $n=10$ paired trials.
+Entries are mean IoU$_{.25}$ difference (wins/10).}
+\label{tab:tight}
+\begin{tabular}{lrrr}
+\toprule
+$\rho$ (uniform $\sigma$) & $T'=12$ & $T'=6$ & $T'=3$ \\
+\midrule
+$0.5$ ($\sigma=14.1$) & $+0.036$ (5/10) & $+0.040$ (4/10) & $-0.050$ (4/10) \\
+$2.0$ ($\sigma=7.07$) & $-0.025$ (3/10) & $-0.034$ (3/10) & $-0.123$ (2/10)$^{*}$ \\
+$8.0$ ($\sigma=3.54$) & $-0.022$ (2/10) & $-0.039$ (1/10)$^{*}$ & $-0.128$ (1/10)$^{**}$ \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize $^{*}p<0.05$, $^{**}p<0.01$.}
+\end{tabular}
+\end{table}
+
+No allocation significantly beats uniform at any budget, and every significant
+entry is a loss. At $\rho=0.5$ the point estimates turn positive but win counts
+are 4/10 and 5/10---coin flips driven by asymmetric outliers, since near the
+threshold outcomes are bimodal. The penalty for deviating does shrink
+monotonically as the budget tightens (slope against $\log\rho$ of $-0.021$ to
+$-0.029$), confirming that the theorem's smoothness assumption weakens near the
+cliff, but never enough to reverse the ordering.
+
+Crucially, the paired standard deviation grows faster than the effect
+(\num{0.060}, \num{0.103}, \num{0.173} as $\rho$ tightens), so the best candidate
+gain, $+0.040$, sits at less than a quarter of the noise in the signal an agent
+would learn from. \textbf{Even were it real, it is unlearnable.}
+Figure~\ref{fig:crossover} shows both panels.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figD_budget_crossover.pdf}
+\caption{Left: the penalty for deviating from uniform shrinks toward the collapse
+threshold but never flips. Right: paired-difference noise grows faster than the
+candidate effect.}
+\label{fig:crossover}
+\end{figure}
+
+
+\section{Byzantine Resilience under Differential Privacy}
+\label{sec:p3-results}
+
+\subsection{The Honest Update Envelope}
+\label{sec:p3-envelope}
+
+Every defence needs a model of what a legitimate update looks like, because that
+is what an attacker must imitate. Table~\ref{tab:envelope} measures it.
+
+\begin{table}[t]
+\centering
+\caption{Honest client update norms. Relative spread collapses once DP noise is
+present, matching the $1/\sqrt{2D}=\SI{0.094}{\percent}$ concentration of a
+Gaussian norm at $D=\num{566789}$.}
+\label{tab:envelope}
+\begin{tabular}{lrr}
+\toprule
+$\sigma$ & update norm & relative s.d. \\
+\midrule
+0 (no DP) & $0.6917\pm0.6548$ & \SI{95}{\percent} \\
+1.83 & $2.2487\pm0.0187$ & \SI{0.83}{\percent} \\
+4.0 & $4.8853\pm0.0095$ & \SI{0.19}{\percent} \\
+8.0 & $9.7586\pm0.0100$ & \SI{0.10}{\percent} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This inverts the premise of DP-exploiting poisoning. Attacks of that family
+assume DP noise widens the acceptance band an attacker can hide in. In high
+dimensions the norm of a Gaussian vector concentrates, so DP noise makes the
+update norm \emph{more} predictable, not less: without noise the norm varies by
+\SI{95}{\percent} across clients, and with it by \SI{0.1}{\percent}. The
+camouflage effect is a small-$D$ phenomenon and vanishes at detector scale.
+
+What survives is \emph{direction}. A norm detector constrains magnitude only, and
+in \num{566789} dimensions a rotated update is nearly orthogonal to the honest
+one. We therefore implement the adaptive attack as a norm-preserving direction
+attack, the strongest form the envelope permits.
+
+\subsection{Attacks and Defences}
+
+\textbf{RMD} returns a randomly falsified update with no attempt at concealment.
+\textbf{$\alpha$-MPELM} steers against the honest update and rescales to the
+honest norm, adapting its poisoning degree $\gamma$ from whether it was detected
+in the previous round. Defences are a \textbf{norm} detector (median-absolute
+deviation band), an \textbf{accuracy} detector (server-side validation influence
+on a held-out set disjoint from the reported metric set), their \textbf{mix}, and
+three robust aggregators: \textbf{Krum}, \textbf{coordinate-wise median} and
+\textbf{trimmed mean}. Grid: 33 configurations $\times$ 3 trials, 10 clients,
+$m\in\{1,2,3\}$ malicious (\SIrange{10}{30}{\percent}), 15 rounds.
+
+\subsection{Results}
+
+\begin{table}[t]
+\centering
+\caption{Byzantine resilience at $m=\SI{30}{\percent}$ malicious clients.
+IoU$_{.25}$ over final rounds; TPR is detection rate against $\alpha$-MPELM;
+FPR is honest clients wrongly rejected.}
+\label{tab:p3}
+\begin{tabular}{lrrrrr}
+\toprule
+Defence & no attack & RMD & $\alpha$-MPELM & TPR & FPR \\
+\midrule
+none & 0.6485 & 0.6410 & \textbf{0.6312} & --- & 0.00 \\
+Norm & 0.6521 & 0.6446 & 0.6428 & 0.14 & 0.10 \\
+Accuracy & 0.6656 & 0.6635 & 0.6616 & 0.24 & 0.19 \\
+Mix & 0.6655 & 0.6583 & \textbf{0.6649} & \textbf{0.32} & 0.28 \\
+Krum & 0.6386 & \textbf{0.5759} & 0.6760 & 0.00 & 0.00 \\
+Median & 0.4402 & 0.4333 & \textbf{0.3168} & 0.00 & 0.00 \\
+Trimmed mean & 0.6441 & 0.6373 & 0.6282 & 0.00 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three findings follow (Figures~\ref{fig:p1}--\ref{fig:p4}).
+
+\paragraph{The published attack asymmetry reproduces.} The norm detector catches
+RMD at TPR $=1.00$ and $\alpha$-MPELM at TPR $=0.14$. The episodic adaptation
+behaves as designed: $\gamma$ escalates to $1.0$ when the attacker is never
+caught and is driven down to $\approx0.14$ once a detector begins firing.
+
+\paragraph{The architecture is inherently resilient.} The worst undefended
+degradation is $-0.017$ IoU$_{.25}$, \SI{2.7}{\percent} relative, at
+\SI{30}{\percent} malicious clients. This follows from the envelope: with a
+\SI{2}{\percent} norm band an attacker cannot amplify, so the strongest legal
+move is direction reversal at matched norm, and three reversed updates in ten
+merely scale the average down rather than corrupting it. Resilience here is a
+\emph{consequence of DP}, not of a defence. Mix detection removes the residue
+entirely ($0.6649$ against a $0.6485$ baseline) at the cost of rejecting
+\SI{28}{\percent} of honest contributions---a trade that should be reported
+alongside detection rate.
+
+\paragraph{Classical robust aggregators are counterproductive under DP.}
+Coordinate-wise median costs $-0.208$ IoU$_{.25}$ \emph{with no attacker
+present}, an order of magnitude more than any attack studied here; Krum costs
+$-0.073$ under RMD. The reason is structural: averaging is precisely what
+suppresses DP noise, by $\sqrt{N}$, and median and Krum discard it while also
+breaking the update's directional structure. Under DP, the standard Byzantine
+toolkit can cost more than the threat it addresses.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figP1_defence_comparison.pdf}
+\caption{Defence comparison at $m=\SI{30}{\percent}$.}
+\label{fig:p1}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figP2_detection.pdf}
+\caption{Detection rate against malicious ratio, and the false-positive cost
+borne by honest clients.}
+\label{fig:p2}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\textwidth]{figP3_gamma.pdf}
+\caption{Poisoning degree $\gamma$ over rounds: the attacker escalates when
+undetected and retreats when caught.}
+\label{fig:p3}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figP4_robust_agg.pdf}
+\caption{Accuracy trajectories with and without robust aggregation.}
+\label{fig:p4}
+\end{figure}
+
+
+\chapter{Discussion and Conclusion}
+\label{sec:discussion}
+
+\section{Summary}
+
+Adaptive per-round privacy budget allocation cannot outperform uniform allocation
+in clipped DP-FL, because clipping removes the very signal variation the approach
+is designed to exploit. We prove this, verify it across 13 allocations from three
+families, and show that the bound applies to published learned allocators because
+their state space confines them to fixed schedules. On the security side, the
+same high dimensionality that makes DP costly also makes it protective: update
+norms concentrate, attacker amplitude is capped, and observed degradation under
+adaptive poisoning at \SI{30}{\percent} malicious clients is \SI{2.7}{\percent}
+relative.
+
+\section{Implications}
+
+For practitioners, three recommendations follow. Spend the privacy budget
+uniformly and invest engineering effort elsewhere. Do not use adaptive optimisers
+with DP-SGD, since they normalise the privacy parameter away. Prefer detection
+over robust aggregation when DP is present, and report the false-positive cost.
+
+For the literature, the results suggest that reported gains from adaptive
+allocation---often around \SI{0.3}{\percent} relative and published without error
+bars---are within the noise of the experimental designs used to obtain them. Our
+CRN protocol reaches at $n=20$ the precision that $n\approx150$ would give
+without it, and at that precision the effect is absent.
+
+We are careful about what this does and does not say. We reproduced the source
+method on its own benchmarks (Section~\ref{sec:replication}), so the claim is not
+that the original work is mistaken about what it observed. The claim is that the
+observation is not separable from noise at the precision used to obtain it, and
+that a mechanism argument---Theorem~\ref{thm:uniform}, together with the
+measurement in Table~\ref{tab:clipbinds} showing that clipping binds by
+$8\times$ even in the source configuration---predicts no separable effect should
+exist. A negative result of this kind is only as strong as the effort spent
+trying to make the positive result appear, which is why
+Section~\ref{sec:results-alloc} reports a pre-registered search over three
+schedule families, a mild front-load chosen specifically to be cheap in variance,
+early stopping, and a ladder of privacy budgets down to the collapse threshold.
+
+\section{Limitations}
+
+Results are on a clear-sky subset partitioned by session; absolute numbers do not
+transfer to cluttered scenes. Theorem~\ref{thm:uniform} assumes clipping binds
+(verified here at $27\times$) and utility monotone in accumulated variance, an
+assumption that measurably weakens near the collapse threshold though never
+enough to change the conclusion. The poisoning study covers two attacks at
+$m\le\SI{30}{\percent}$. The cross-client extension is proved but not verified
+empirically.
+
+\section{Future Work}
+
+The one policy class our bound does not cover is an agent whose state includes
+model feedback---current loss or gradient norm---which can react to realised
+noise instead of committing to a schedule in advance. Whether exploitable
+per-run variance exists is unmeasured and is the natural next question. On the
+security side, an attacker that optimises direction against the accuracy detector
+rather than simply reversing it would be a stronger test than the one used here.
+
+\section{Conclusion}
+
+The contribution is a negative result with a proof and a positive result with a
+mechanism. Uniform privacy-budget allocation is optimal, not merely a reasonable
+default, and the learned allocators proposed to improve on it are bounded by that
+optimum. The same dimensional scaling that makes differential privacy expensive
+for detection also makes the resulting system difficult to poison. Both findings
+were obtained in a regime constructed specifically to give the alternatives every
+chance to succeed.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{chen2024adaptive}
+Y.~Chen, W.~Liao, X.~Ma, and Z.~Chen,
+``Adaptive Privacy Budget Allocation in Federated Learning: A Multi-Agent
+Reinforcement Learning Approach,''
+in \emph{Proc. IEEE Int. Conf. Communications (ICC)}, 2024.
+
+\bibitem{hossain2025exploiting}
+M.~T. Hossain, S.~Badsha, H.~La, S.~Islam, and I.~Khalil,
+``Exploiting Gaussian Noise Variance for Dynamic Differential Poisoning in
+Federated Learning,''
+\emph{IEEE Trans. Artificial Intelligence}, vol.~6, no.~11, pp.~2922--2939, 2025.
+
+\bibitem{abadi2016deep}
+M.~Abadi, A.~Chu, I.~Goodfellow, H.~B. McMahan, I.~Mironov, K.~Talwar, and
+L.~Zhang,
+``Deep Learning with Differential Privacy,''
+in \emph{Proc. ACM SIGSAC Conf. Computer and Communications Security}, 2016,
+pp.~308--318.
+
+\bibitem{mcmahan2017communication}
+H.~B. McMahan, E.~Moore, D.~Ramage, S.~Hampson, and B.~A. y~Arcas,
+``Communication-Efficient Learning of Deep Networks from Decentralized Data,''
+in \emph{Proc. AISTATS}, 2017, pp.~1273--1282.
+
+\bibitem{bun2016concentrated}
+M.~Bun and T.~Steinke,
+``Concentrated Differential Privacy: Simplifications, Extensions, and Lower
+Bounds,''
+in \emph{Theory of Cryptography Conference (TCC)}, 2016, pp.~635--658.
+
+\bibitem{blanchard2017machine}
+P.~Blanchard, E.~M. El~Mhamdi, R.~Guerraoui, and J.~Stainer,
+``Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent,''
+in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2017.
+
+\bibitem{yin2018byzantine}
+D.~Yin, Y.~Chen, R.~Kannan, and P.~Bartlett,
+``Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates,''
+in \emph{Proc. Int. Conf. Machine Learning (ICML)}, 2018, pp.~5650--5659.
+
+\bibitem{ng1999policy}
+A.~Y. Ng, D.~Harada, and S.~Russell,
+``Policy Invariance Under Reward Transformations: Theory and Application to
+Reward Shaping,''
+in \emph{Proc. Int. Conf. Machine Learning (ICML)}, 1999, pp.~278--287.
+
+\bibitem{lillicrap2016continuous}
+T.~P. Lillicrap, J.~J. Hunt, A.~Pritzel, N.~Heess, T.~Erez, Y.~Tassa,
+D.~Silver, and D.~Wierstra,
+``Continuous Control with Deep Reinforcement Learning,''
+in \emph{Proc. Int. Conf. Learning Representations (ICLR)}, 2016.
+
+\bibitem{sunehag2018value}
+P.~Sunehag et~al.,
+``Value-Decomposition Networks for Cooperative Multi-Agent Learning Based on
+Team Reward,''
+in \emph{Proc. AAMAS}, 2018, pp.~2085--2087.
+
+\bibitem{zhao2023antiuav}
+J.~Zhao et~al.,
+``Anti-UAV600: A Large-Scale Benchmark for Thermal Infrared Unmanned Aerial
+Vehicle Tracking,''
+\emph{arXiv preprint}, 2023.
+
+\bibitem{opacus2021}
+A.~Yousefpour et~al.,
+``Opacus: User-Friendly Differential Privacy Library in PyTorch,''
+\emph{arXiv preprint arXiv:2109.12298}, 2021.
+
+\end{thebibliography}

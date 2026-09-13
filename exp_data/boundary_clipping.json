@@ -1,0 +1,27 @@
+{
+ "C": 6.0,
+ "D": 59386,
+ "batch": 200,
+ "results": {
+  "round_0": {
+   "median": 1.1820684671401978,
+   "mean": 1.191341519355774,
+   "frac_clipped": 0.0
+  },
+  "early (after 5 rounds)": {
+   "median": 37.93245315551758,
+   "mean": 40.02525329589844,
+   "frac_clipped": 0.8999199271202087
+  },
+  "late (after 25 rounds)": {
+   "median": 48.11211395263672,
+   "mean": 55.361351013183594,
+   "frac_clipped": 0.7893379330635071
+  }
+ },
+ "detector_reference": {
+  "median_grad_norm": 26.8,
+  "C": 1.0,
+  "binds_factor": 26.8
+ }
+}
