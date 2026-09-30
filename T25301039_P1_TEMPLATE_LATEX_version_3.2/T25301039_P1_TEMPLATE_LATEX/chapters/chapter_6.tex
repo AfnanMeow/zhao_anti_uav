@@ -1,0 +1,137 @@
+\label{sec:discussion}
+
+\section{Summary of Findings}
+
+Adaptive per-round privacy budget allocation cannot outperform uniform
+allocation in clipped DP-FL, because clipping removes the very signal variation
+the approach is designed to exploit. We prove this
+(Theorem~\ref{thm:uniform}), verify it across 13 allocations from three
+unrelated families ordered by a single closed-form scalar, and show that the
+bound applies to published learned allocators because their state space confines
+them to fixed schedules. Training the agent and running it confirms the
+prediction: it learns a non-uniform schedule and loses to uniform by $-0.043$
+mAP over paired held-out trials. The same inequality closes the analogous
+problems of allocating a budget across layers and across clients, neither of
+which requires a separate experiment.
+
+\vspace{10pt}
+
+On the security side, the same high dimensionality that makes DP costly for
+detection also makes it protective. Update norms concentrate as $1/\sqrt{2D}$,
+attacker amplitude is capped by the resulting narrow envelope, and the observed
+degradation under adaptive poisoning at $30\%$ malicious clients is $2.7\%$
+relative. Detection-based defences neutralise what remains; classical robust
+aggregators cost more than the attacks do.
+
+\section{Implications for Practice}
+
+Three recommendations follow for practitioners building differentially private
+federated systems.
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Spend the privacy budget uniformly} and invest engineering
+  effort elsewhere. Uniform is not merely a reasonable default but the analytic
+  optimum under per-sample clipping, and the effort required to search for a
+  better schedule is better spent on the architecture or the data partition.
+  \item \textbf{Do not use adaptive optimisers with DP-SGD.} Adam normalises the
+  privacy parameter away: a sixteen-fold change in $\sigma$ moved accuracy by
+  $0.016$, while the privacy accountant continued to report the intended
+  $\varepsilon$. This is a silent failure that inflates apparent utility at a
+  claimed privacy level.
+  \item \textbf{Prefer detection over robust aggregation when DP is present},
+  and report the false-positive cost. Averaging is what suppresses DP noise, so
+  replacing it with a robust statistic forfeits that suppression; in our setting
+  coordinate-wise median cost an order of magnitude more than any attack tested.
+\end{enumerate}
+
+\section{Implications for the Literature}
+
+The results suggest that reported gains from adaptive allocation, often around
+$0.3\%$ relative and published without error bars, are within the noise of the
+experimental designs used to obtain them. The CRN protocol used here reaches at
+$n=20$ the precision that $n\approx150$ would give without it, and at that
+precision the effect is absent.
+
+\vspace{10pt}
+
+We are careful about what this does and does not say. The claim is not that the
+original work is mistaken about what it observed. The claim is that the
+observation is not separable from noise at the precision used to obtain it, and
+that a mechanism argument, Theorem~\ref{thm:uniform} together with the
+measurement in Table~\ref{tab:clipbinds} showing that clipping binds by
+$8\times$ even in the source configuration, predicts that no separable effect
+should exist.
+
+\vspace{10pt}
+
+A negative result of this kind is only as strong as the effort spent trying to
+make the positive result appear. That effort is documented rather than asserted:
+Chapter~5 reports a pre-registered search over three schedule families, a mild
+front-load chosen specifically to be cheap in variance, early stopping, and a
+ladder of privacy budgets down to the collapse threshold, with all outcomes
+reported including those that initially looked favourable. Four separate
+single-run results that appeared positive did not survive replication, and each
+is reported.
+
+\section{Limitations}
+\label{sec:limitations}
+
+Results are obtained on a clear-sky subset partitioned by recording session, and
+absolute numbers do not transfer to cluttered scenes, where the detector sits
+near the floor. We note that this choice favours the alternative hypothesis: it
+is the condition under which a non-uniform schedule has the most room to show an
+advantage.
+
+\vspace{10pt}
+
+Theorem~\ref{thm:uniform} assumes that clipping binds, verified here at
+$27\times$ for the detector and $8\times$ for the source configuration, and that
+utility is monotone in accumulated variance. The latter assumption measurably
+weakens near the collapse threshold, where the penalty for deviating from
+uniform shrinks with slope $-0.021$ to $-0.029$ against $\log\rho$, though never
+enough to change the conclusion. Configurations in which clipping does not bind,
+for instance a very large $C$ with small gradients, fall outside the theorem;
+there the premise would be live, though such configurations also forfeit much of
+the privacy guarantee that motivates clipping.
+
+\vspace{10pt}
+
+The poisoning study covers two attacks at $m\le30\%$ malicious clients, at a
+single noise level, on the clear-sky subset. The cross-client extension of the
+theorem is proved but not verified empirically. The implementation port to
+CIFAR-10 described in Section~\ref{sec:provenance} is single-run per arm and no
+conclusion rests on it.
+
+\section{Future Work}
+\label{sec:future}
+
+The one policy class our bound does not cover is an agent whose state includes
+model feedback, such as the current loss or realised gradient norm, and which
+can therefore react to the noise actually drawn instead of committing to a
+schedule in advance. Theorem~\ref{thm:uniform} constrains the expected
+accumulated variance of any fixed schedule, but a controller that observes the
+realised trajectory is optimising a different, larger object. Whether
+exploitable per-run variance exists at all is unmeasured, and is the natural
+next question; the online noise-modulation family exemplified by DNO-RL
+\cite{WangDNORL} is the closest existing point of comparison.
+
+\vspace{10pt}
+
+On the security side, an attacker that optimises direction against the accuracy
+detector, rather than simply reversing it, would be a stronger test than the one
+used here, since the accuracy detector is the component that carries the mix
+defence. Extending the envelope analysis across model scales would also
+establish where the camouflage premise crosses from live to inert, which this
+work locates only at its two endpoints.
+
+\section{Conclusion}
+
+The contribution is a negative result with a proof and a positive result with a
+mechanism. Uniform privacy-budget allocation is optimal, not merely a reasonable
+default, and the learned allocators proposed to improve on it are bounded by
+that optimum because their state space confines them to the class of fixed
+schedules. The same dimensional scaling that makes differential privacy
+expensive for detection also makes the resulting system difficult to poison, by
+concentrating the honest update norm and capping the amplitude available to an
+attacker. Both findings were obtained in a regime constructed specifically to
+give the alternatives every chance to succeed.

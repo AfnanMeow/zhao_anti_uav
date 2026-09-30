@@ -1,0 +1,137 @@
+\section{Background}
+
+Federated learning (FL) trains a shared model across decentralised clients
+without pooling raw data \cite{mcmahan2017communication}. It does not, by
+itself, provide a privacy guarantee: model updates leak information about the
+data that produced them, and reconstruction, membership-inference and
+attribute-inference attacks all operate on shared gradients alone. Differential
+privacy (DP) supplies the missing guarantee by clipping each per-sample gradient
+to a norm $C$ and adding calibrated Gaussian noise \cite{abadi2016deep}, at a
+cost in utility.
+
+\vspace{10pt}
+
+In the federated setting the privacy budget is consumed over many communication
+rounds, which raises a scheduling question: given a total budget $\rho$, how
+should it be divided among rounds? The intuition motivating adaptive schemes is
+that gradients are large early in training and small later, so early rounds
+should tolerate more noise. Several recent works formalise this as a learning
+problem and train reinforcement-learning agents to allocate the budget
+\cite{ChenAdaptivePrivacyMARL, WangDNORL}.
+
+\vspace{10pt}
+
+This thesis asks whether that intuition survives contact with the mechanism it
+is built on, in a demanding application: federated thermal detection of small
+unmanned aerial vehicles, where targets occupy a handful of pixels and the
+detector has little accuracy to spare.
+
+\section{Motivation}
+
+Two observations motivate the work.
+
+\vspace{10pt}
+
+First, the adaptive-allocation intuition is stated in terms of \emph{gradient
+magnitude}, but DP-SGD clips every per-sample gradient to a fixed norm before
+noise is added. If clipping binds, and we measure it binding by a factor of
+$27$ in our own setting and by a factor of $8$ in the source method's published
+configuration, then the magnitude that the intuition refers to has been removed
+from the mechanism before it can reach the aggregate. Whether anything remains
+for an allocator to exploit is an empirical and theoretical question that the
+literature has not settled.
+
+\vspace{10pt}
+
+Second, DP and Byzantine robustness are usually studied separately, and are
+assumed to compose. They interact. DP noise is what a poisoning attacker can
+hide behind, and averaging, the operation that a robust aggregator replaces, is
+what suppresses DP noise. Neither interaction is captured by studying either
+mechanism alone.
+
+\section{Problem Statement}
+
+Let $T$ communication rounds each consume $\rho_t$ of a client's total budget
+$\rho$, with per-round noise multiplier $\sigma_t$ determined by $\rho_t$. The
+allocation problem is to choose $\{\rho_t\}$ with $\sum_t \rho_t = \rho$ so as to
+maximise final model utility.
+
+\vspace{10pt}
+
+The literature treats this as an open optimisation to be solved by a learned
+policy. We ask instead whether it has a closed-form solution, and if so whether
+the learned policies can improve on it. We then ask what the same architecture's
+security properties are under adaptive model poisoning, and whether standard
+Byzantine defences remain appropriate once DP is present.
+
+\section{Research Objectives}
+
+\begin{enumerate}[label=O\arabic*.]
+  \item Characterise the optimum of the per-round privacy budget allocation
+  problem analytically under per-sample clipping, rather than treating it as an
+  open optimisation to be solved numerically.
+  \item Test that characterisation empirically in a regime constructed so that
+  accuracy is genuinely sensitive to the noise multiplier, using a statistical
+  protocol precise enough to resolve the effect sizes at stake.
+  \item Establish whether learned allocators, as published, can escape the
+  resulting bound.
+  \item Measure the honest update envelope of a differentially private detector
+  and determine whether the camouflage premise of DP-exploiting poisoning
+  attacks holds at detector scale.
+  \item Evaluate detection-based and aggregation-based Byzantine defences in the
+  presence of DP, including their cost to honest participants.
+\end{enumerate}
+
+\section{Contributions}
+
+\begin{enumerate}
+  \item \textbf{An optimality result.} Under per-sample clipping, uniform
+  allocation minimises the noise variance accumulated into the global model, and
+  every non-uniform schedule is strictly worse (Section~\ref{sec:theory}). The
+  same inequality closes allocation across layers and across clients.
+
+  \item \textbf{Empirical validation at scale.} Thirteen allocations from three
+  unrelated families, paired with common random numbers, are ordered by a single
+  scalar (Spearman $\rho=-0.767$, $p=0.0022$). No allocation beats uniform at
+  any privacy budget tested (Section~\ref{sec:results-alloc}). The learned
+  allocator itself, trained and evaluated on held-out data over paired trials,
+  likewise fails to beat uniform (Section~\ref{sec:drl-practice}).
+
+  \item \textbf{A configuration methodology for DP-FL detection.} We give an
+  SNR model, $\text{eff.\ SNR}\propto \sqrt{B}/(\sigma\sqrt{D})$, that predicts
+  where a detector's accuracy becomes noise-sensitive, and validate its
+  predictions to within a factor of two (Section~\ref{sec:calibration}). We also
+  identify a pitfall: adaptive optimisers such as Adam normalise the noise scale
+  away entirely, rendering the privacy parameter inert.
+
+  \item \textbf{A concentration result for DP poisoning.} High-dimensional
+  concentration makes the honest update norm highly predictable ($0.10\%$
+  relative standard deviation), inverting the premise of DP-camouflage attacks
+  and capping attacker amplitude (Section~\ref{sec:p3-envelope}).
+
+  \item \textbf{A Byzantine-resilience study under DP}, including the finding
+  that classical robust aggregators are counterproductive in this regime
+  (Section~\ref{sec:p3-results}).
+\end{enumerate}
+
+\section{Scope and Limitations}
+
+Results are obtained on a clear-sky subset of the Anti-UAV600 thermal benchmark
+\cite{zhao20233rd}, partitioned by recording session, with a frozen publicly
+pretrained trunk and a 566,789-parameter privately trained head. Absolute
+detection numbers describe this subset and should not be read as general
+anti-UAV performance; the comparisons are relative and unaffected. The poisoning
+study covers two attacks at up to $30\%$ malicious clients.
+Section~\ref{sec:limitations} states what is and is not covered.
+
+\section{Thesis Organisation}
+
+Chapter~2 reviews differentially private federated learning, adaptive budget
+allocation, Byzantine-robust aggregation, and poisoning attacks that exploit DP
+noise, and identifies the gap addressed here. Chapter~3 formalises the system
+model and proves the optimality of uniform allocation, together with its
+extensions across layers and clients. Chapter~4 describes the dataset,
+architecture and calibration procedure used to construct a regime in which the
+allocation question is measurable at all, and states the statistical protocol.
+Chapter~5 reports the allocation results and the Byzantine-resilience study.
+Chapter~6 discusses implications, limitations and future work.

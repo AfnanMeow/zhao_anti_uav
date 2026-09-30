@@ -1,0 +1,14 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Noise sensitivity in the calibrated regime. IoU$_{.25}$ on held-out sessions; floor (random head) $0.001$, trivial predictor $0.021$.}}{12}{table.caption.16}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Does clipping bind? Median per-sample gradient norm against the clipping threshold $C$. Clipping binds in both settings, so assumption~(i) of Theorem~\ref {thm:uniform} holds for the source method's own configuration as well as for ours.}}{13}{table.caption.18}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Power-law schedules against uniform, $n=20$ paired trials with common random numbers, $\rho =30$. The variance penalty is $\DOTSB \sum@ \slimits@ _t\sigma _t^2$ relative to the uniform minimum. Every significant entry is a loss.}}{15}{table.caption.19}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Truncation against uniform across privacy budgets, $n=10$ paired trials. Entries are the mean IoU$_{.25}$ difference, with wins out of 10 in parentheses. $^{*}p<0.05$, $^{**}p<0.01$.}}{17}{table.caption.21}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces The learned allocator against the baselines it was designed to beat. Final mAP@0.5 on held-out data, $n=8$ paired trials, mean $\pm $ standard deviation; differences are DRL minus baseline.}}{19}{table.caption.23}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Honest client update norms. Relative spread collapses once DP noise is present, matching the $1/\sqrt {2D}=0.094\%$ concentration of a Gaussian norm at $D=566{,}789$.}}{21}{table.caption.27}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Byzantine resilience at $m=30\%$ malicious clients. IoU$_{.25}$ over final rounds; TPR is the detection rate against $\alpha $-MPELM; FPR is the fraction of honest clients wrongly rejected.}}{22}{table.caption.28}%
+\addvspace {10\p@ }

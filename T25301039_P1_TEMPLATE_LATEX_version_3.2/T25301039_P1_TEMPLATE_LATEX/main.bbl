@@ -1,0 +1,1068 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{ynt/global//global/global/global}
+    \entry{ng1999policy}{inproceedings}{}{}
+      \name{author}{3}{}{%
+        {{hash=49e889356ff39df159461bc2895c7e16}{%
+           family={Ng},
+           familyi={N\bibinitperiod},
+           given={Andrew\bibnamedelima Y.},
+           giveni={A\bibinitperiod\bibinitdelim Y\bibinitperiod}}}%
+        {{hash=3852e67d6ba58b4e2a2ac6ce5d71c4a1}{%
+           family={Harada},
+           familyi={H\bibinitperiod},
+           given={Daishi},
+           giveni={D\bibinitperiod}}}%
+        {{hash=143fa183327d9fcd9de18eec99d6ca97}{%
+           family={Russell},
+           familyi={R\bibinitperiod},
+           given={Stuart},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{6560b08fe4d1b0f58face2ac29598c6a}
+      \strng{fullhash}{04b4f38b08567b85d2b7665e50728e38}
+      \strng{fullhashraw}{04b4f38b08567b85d2b7665e50728e38}
+      \strng{bibnamehash}{04b4f38b08567b85d2b7665e50728e38}
+      \strng{authorbibnamehash}{04b4f38b08567b85d2b7665e50728e38}
+      \strng{authornamehash}{6560b08fe4d1b0f58face2ac29598c6a}
+      \strng{authorfullhash}{04b4f38b08567b85d2b7665e50728e38}
+      \strng{authorfullhashraw}{04b4f38b08567b85d2b7665e50728e38}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 16th International Conference on Machine Learning (ICML)}
+      \field{title}{Policy Invariance Under Reward Transformations: Theory and Application to Reward Shaping}
+      \field{year}{1999}
+      \field{pages}{278\bibrangedash 287}
+      \range{pages}{10}
+    \endentry
+    \entry{abadi2016deep}{inproceedings}{}{}
+      \name{author}{7}{}{%
+        {{hash=f39ffee58f8a71d84d8b13c05804b2cc}{%
+           family={Abadi},
+           familyi={A\bibinitperiod},
+           given={Martin},
+           giveni={M\bibinitperiod}}}%
+        {{hash=25446ff761c3633df18431097f7205ca}{%
+           family={Chu},
+           familyi={C\bibinitperiod},
+           given={Andy},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5d2585c11210cf1d4512e6e0a03ec315}{%
+           family={Goodfellow},
+           familyi={G\bibinitperiod},
+           given={Ian},
+           giveni={I\bibinitperiod}}}%
+        {{hash=707fa44f08f047ab822f84fe38c69dfb}{%
+           family={McMahan},
+           familyi={M\bibinitperiod},
+           given={H.\bibnamedelimi Brendan},
+           giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=2eea0075441c4e9acfc378c1345323f2}{%
+           family={Mironov},
+           familyi={M\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+        {{hash=1754a40f9d600dea756c1dd1047ce170}{%
+           family={Talwar},
+           familyi={T\bibinitperiod},
+           given={Kunal},
+           giveni={K\bibinitperiod}}}%
+        {{hash=32a08717e0d6dcde59bc98b96800ed6c}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Li},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{1cf6f3c19f4fd018f06a8f6a49bc4394}
+      \strng{fullhash}{6789995b8049ab2d061a5a6e71e0d100}
+      \strng{fullhashraw}{6789995b8049ab2d061a5a6e71e0d100}
+      \strng{bibnamehash}{1cf6f3c19f4fd018f06a8f6a49bc4394}
+      \strng{authorbibnamehash}{1cf6f3c19f4fd018f06a8f6a49bc4394}
+      \strng{authornamehash}{1cf6f3c19f4fd018f06a8f6a49bc4394}
+      \strng{authorfullhash}{6789995b8049ab2d061a5a6e71e0d100}
+      \strng{authorfullhashraw}{6789995b8049ab2d061a5a6e71e0d100}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security (CCS)}
+      \field{title}{Deep Learning with Differential Privacy}
+      \field{year}{2016}
+      \field{pages}{308\bibrangedash 318}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1145/2976749.2978318
+      \endverb
+    \endentry
+    \entry{bun2016concentrated}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=743c08ac9fef9821a588db73588eb002}{%
+           family={Bun},
+           familyi={B\bibinitperiod},
+           given={Mark},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a8ee507f496e43705d0c170feeb81861}{%
+           family={Steinke},
+           familyi={S\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{52a64f29abe54c01dea2be0820176878}
+      \strng{fullhash}{52a64f29abe54c01dea2be0820176878}
+      \strng{fullhashraw}{52a64f29abe54c01dea2be0820176878}
+      \strng{bibnamehash}{52a64f29abe54c01dea2be0820176878}
+      \strng{authorbibnamehash}{52a64f29abe54c01dea2be0820176878}
+      \strng{authornamehash}{52a64f29abe54c01dea2be0820176878}
+      \strng{authorfullhash}{52a64f29abe54c01dea2be0820176878}
+      \strng{authorfullhashraw}{52a64f29abe54c01dea2be0820176878}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Theory of Cryptography Conference (TCC)}
+      \field{title}{Concentrated Differential Privacy: Simplifications, Extensions, and Lower Bounds}
+      \field{year}{2016}
+      \field{pages}{635\bibrangedash 658}
+      \range{pages}{24}
+      \verb{doi}
+      \verb 10.1007/978-3-662-53641-4_24
+      \endverb
+    \endentry
+    \entry{lillicrap2016continuous}{inproceedings}{}{}
+      \name{author}{8}{}{%
+        {{hash=2a321a868e44d49baf52b5e2d816fb71}{%
+           family={Lillicrap},
+           familyi={L\bibinitperiod},
+           given={Timothy\bibnamedelima P.},
+           giveni={T\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=e0c5cec59a932511b2af6220473fad61}{%
+           family={Hunt},
+           familyi={H\bibinitperiod},
+           given={Jonathan\bibnamedelima J.},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=4295e4094c426f01903ac60155866130}{%
+           family={Pritzel},
+           familyi={P\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=231312991eab5915498d6c19c2a8cd4e}{%
+           family={Heess},
+           familyi={H\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=3b79ca47f08451987877fd8682e971e5}{%
+           family={Erez},
+           familyi={E\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=58112cb88a80c1bc045b6eaab26a8695}{%
+           family={Tassa},
+           familyi={T\bibinitperiod},
+           given={Yuval},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=89dbd30410c2085cd059f32c57d4593e}{%
+           family={Silver},
+           familyi={S\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+        {{hash=d7805381550fb5f8360345f7f72c0b49}{%
+           family={Wierstra},
+           familyi={W\bibinitperiod},
+           given={Daan},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{fullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{fullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{bibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authorbibnamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authornamehash}{e9929f8db9dd2c08064f17b4d9a7c551}
+      \strng{authorfullhash}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \strng{authorfullhashraw}{9f2f0357b439f9ae4a3953d81392aaa0}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the International Conference on Learning Representations (ICLR)}
+      \field{title}{Continuous Control with Deep Reinforcement Learning}
+      \field{year}{2016}
+    \endentry
+    \entry{blanchard2017machine}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=36899e47fdb4788c971961ce7b4386c6}{%
+           family={Blanchard},
+           familyi={B\bibinitperiod},
+           given={Peva},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b2464215140903747374e995a0f73fc2}{%
+           family={El\bibnamedelima Mhamdi},
+           familyi={E\bibinitperiod\bibinitdelim M\bibinitperiod},
+           given={El\bibnamedelima Mahdi},
+           giveni={E\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=6d84b5e8da24c645eb6bc438af7621c4}{%
+           family={Guerraoui},
+           familyi={G\bibinitperiod},
+           given={Rachid},
+           giveni={R\bibinitperiod}}}%
+        {{hash=89acd5b4dcafa2a752da9f1a78df7b1c}{%
+           family={Stainer},
+           familyi={S\bibinitperiod},
+           given={Julien},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{d567587fcc7e9495e93dfe2d968fdb1e}
+      \strng{fullhash}{ccf44a7babe7d4dc893ea94333de69eb}
+      \strng{fullhashraw}{ccf44a7babe7d4dc893ea94333de69eb}
+      \strng{bibnamehash}{ccf44a7babe7d4dc893ea94333de69eb}
+      \strng{authorbibnamehash}{ccf44a7babe7d4dc893ea94333de69eb}
+      \strng{authornamehash}{d567587fcc7e9495e93dfe2d968fdb1e}
+      \strng{authorfullhash}{ccf44a7babe7d4dc893ea94333de69eb}
+      \strng{authorfullhashraw}{ccf44a7babe7d4dc893ea94333de69eb}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems (NeurIPS)}
+      \field{title}{Machine Learning with Adversaries: Byzantine Tolerant Gradient Descent}
+      \field{year}{2017}
+    \endentry
+    \entry{mcmahan2017communication}{inproceedings}{}{}
+      \name{author}{5}{}{%
+        {{hash=707fa44f08f047ab822f84fe38c69dfb}{%
+           family={McMahan},
+           familyi={M\bibinitperiod},
+           given={H.\bibnamedelimi Brendan},
+           giveni={H\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=4720b7685b2c38f8a5f238d67aac6c45}{%
+           family={Moore},
+           familyi={M\bibinitperiod},
+           given={Eider},
+           giveni={E\bibinitperiod}}}%
+        {{hash=86066638fba5b4dc33bcee0bcba473cf}{%
+           family={Ramage},
+           familyi={R\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=bd7751169aeb03f0e8ce6fd2a06822d3}{%
+           family={Hampson},
+           familyi={H\bibinitperiod},
+           given={Seth},
+           giveni={S\bibinitperiod}}}%
+        {{hash=b35041bca3c3edf78caf9ba2e13c6fd5}{%
+           family={Agüera\bibnamedelimb y\bibnamedelima Arcas},
+           familyi={A\bibinitperiod\bibinitdelim y\bibinitperiod\bibinitdelim A\bibinitperiod},
+           given={Blaise},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{a1451f4ba9f1025b922d26afb2931f2f}
+      \strng{fullhash}{feb68f91b302084c87b65ca51e508642}
+      \strng{fullhashraw}{feb68f91b302084c87b65ca51e508642}
+      \strng{bibnamehash}{feb68f91b302084c87b65ca51e508642}
+      \strng{authorbibnamehash}{feb68f91b302084c87b65ca51e508642}
+      \strng{authornamehash}{a1451f4ba9f1025b922d26afb2931f2f}
+      \strng{authorfullhash}{feb68f91b302084c87b65ca51e508642}
+      \strng{authorfullhashraw}{feb68f91b302084c87b65ca51e508642}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 20th International Conference on Artificial Intelligence and Statistics (AISTATS)}
+      \field{title}{Communication-Efficient Learning of Deep Networks from Decentralized Data}
+      \field{year}{2017}
+      \field{pages}{1273\bibrangedash 1282}
+      \range{pages}{10}
+    \endentry
+    \entry{sunehag2018value}{inproceedings}{}{}
+      \name{author}{11}{}{%
+        {{hash=daf6cbed703aa44e31d950c3c2720056}{%
+           family={Sunehag},
+           familyi={S\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+        {{hash=56f0d34650d75bc4863946b239695751}{%
+           family={Lever},
+           familyi={L\bibinitperiod},
+           given={Guy},
+           giveni={G\bibinitperiod}}}%
+        {{hash=670a5857297893dc153211fd8a8ec921}{%
+           family={Gruslys},
+           familyi={G\bibinitperiod},
+           given={Audrunas},
+           giveni={A\bibinitperiod}}}%
+        {{hash=2e540193e28e5b3aa63fef2e515c637b}{%
+           family={Czarnecki},
+           familyi={C\bibinitperiod},
+           given={Wojciech\bibnamedelima Marian},
+           giveni={W\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=98cf1e75177753af32ffdc6c1650a6e5}{%
+           family={Zambaldi},
+           familyi={Z\bibinitperiod},
+           given={Vinícius},
+           giveni={V\bibinitperiod}}}%
+        {{hash=7dc1446dea7ff50b2b02fb83780cc9c6}{%
+           family={Jaderberg},
+           familyi={J\bibinitperiod},
+           given={Max},
+           giveni={M\bibinitperiod}}}%
+        {{hash=3075d0e02c0833f6e5fe1addb880898f}{%
+           family={Lanctot},
+           familyi={L\bibinitperiod},
+           given={Marc},
+           giveni={M\bibinitperiod}}}%
+        {{hash=6292996963ada78bbb98cbb8e5cc1651}{%
+           family={Sonnerat},
+           familyi={S\bibinitperiod},
+           given={Nicolas},
+           giveni={N\bibinitperiod}}}%
+        {{hash=698896c85bec4f93adca09e2a21cdf78}{%
+           family={Leibo},
+           familyi={L\bibinitperiod},
+           given={Joel\bibnamedelima Z.},
+           giveni={J\bibinitperiod\bibinitdelim Z\bibinitperiod}}}%
+        {{hash=abe873d21d37af0af9b6711c1efd9caa}{%
+           family={Tuyls},
+           familyi={T\bibinitperiod},
+           given={Karl},
+           giveni={K\bibinitperiod}}}%
+        {{hash=368b9b2de627b852658c433b062d4e1e}{%
+           family={Graepel},
+           familyi={G\bibinitperiod},
+           given={Thore},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{3aadb03dc863012ae319303e8682f1a2}
+      \strng{fullhash}{342e5946aff57151538518a7b968ca74}
+      \strng{fullhashraw}{342e5946aff57151538518a7b968ca74}
+      \strng{bibnamehash}{3aadb03dc863012ae319303e8682f1a2}
+      \strng{authorbibnamehash}{3aadb03dc863012ae319303e8682f1a2}
+      \strng{authornamehash}{3aadb03dc863012ae319303e8682f1a2}
+      \strng{authorfullhash}{342e5946aff57151538518a7b968ca74}
+      \strng{authorfullhashraw}{342e5946aff57151538518a7b968ca74}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 17th International Conference on Autonomous Agents and MultiAgent Systems (AAMAS)}
+      \field{title}{Value-Decomposition Networks for Cooperative Multi-Agent Learning Based on Team Reward}
+      \field{year}{2018}
+      \field{pages}{2085\bibrangedash 2087}
+      \range{pages}{3}
+    \endentry
+    \entry{yin2018byzantine}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=b0665dd4f7088b8cf770f35510046c02}{%
+           family={Yin},
+           familyi={Y\bibinitperiod},
+           given={Dong},
+           giveni={D\bibinitperiod}}}%
+        {{hash=dea59012989c996b08a63f2ecbb689e2}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Yudong},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=8733cf3592d5bf9b6e353c5ec8592102}{%
+           family={Kannan},
+           familyi={K\bibinitperiod},
+           given={Ramchandran},
+           giveni={R\bibinitperiod}}}%
+        {{hash=b8fd5618f4e1de62f22a3b78fbc3d5c5}{%
+           family={Bartlett},
+           familyi={B\bibinitperiod},
+           given={Peter},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{e0dae4406a209f4dd502083846896e0c}
+      \strng{fullhash}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \strng{fullhashraw}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \strng{bibnamehash}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \strng{authorbibnamehash}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \strng{authornamehash}{e0dae4406a209f4dd502083846896e0c}
+      \strng{authorfullhash}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \strng{authorfullhashraw}{57fd517c4330c3ef2e6aabf79c0a8772}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 35th International Conference on Machine Learning (ICML)}
+      \field{title}{Byzantine-Robust Distributed Learning: Towards Optimal Statistical Rates}
+      \field{year}{2018}
+      \field{pages}{5650\bibrangedash 5659}
+      \range{pages}{10}
+    \endentry
+    \entry{ZhuoFederatedDRL}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=75b4ddf17a418863cc9d798eb89f2f44}{%
+           family={Zhuo},
+           familyi={Z\bibinitperiod},
+           given={H.\bibnamedelimi H.},
+           giveni={H\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=487ad18e19be3d7b1a79ca97abd59895}{%
+           family={Feng},
+           familyi={F\bibinitperiod},
+           given={W.},
+           giveni={W\bibinitperiod}}}%
+        {{hash=8b3d031e33fa8ec00b3b97374ef74c0a}{%
+           family={Lin},
+           familyi={L\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=67944c9cfdb53c5189d4fa82fb37af2e}{%
+           family={Xu},
+           familyi={X\bibinitperiod},
+           given={Q.},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=1fb6d669be33ccc30fc5a1911273dc42}{%
+           family={Yang},
+           familyi={Y\bibinitperiod},
+           given={Q.},
+           giveni={Q\bibinitperiod}}}%
+      }
+      \strng{namehash}{4ac1fec55d6a3c8478409a9106f10dc2}
+      \strng{fullhash}{4885164d5df477b02e2eea40d1bb2beb}
+      \strng{fullhashraw}{4885164d5df477b02e2eea40d1bb2beb}
+      \strng{bibnamehash}{4885164d5df477b02e2eea40d1bb2beb}
+      \strng{authorbibnamehash}{4885164d5df477b02e2eea40d1bb2beb}
+      \strng{authornamehash}{4ac1fec55d6a3c8478409a9106f10dc2}
+      \strng{authorfullhash}{4885164d5df477b02e2eea40d1bb2beb}
+      \strng{authorfullhashraw}{4885164d5df477b02e2eea40d1bb2beb}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE}
+      \field{title}{Federated Deep Reinforcement Learning}
+      \field{year}{2020}
+    \endentry
+    \entry{opacus2021}{article}{}{}
+      \name{author}{12}{}{%
+        {{hash=8903e0bb265ab6d1fa1b5039e42ba236}{%
+           family={Yousefpour},
+           familyi={Y\bibinitperiod},
+           given={Ashkan},
+           giveni={A\bibinitperiod}}}%
+        {{hash=b2f6077e759d894c803e26a194db5f18}{%
+           family={Shilov},
+           familyi={S\bibinitperiod},
+           given={Igor},
+           giveni={I\bibinitperiod}}}%
+        {{hash=2b9ab922e693d9237ad952a8030eee9d}{%
+           family={Sablayrolles},
+           familyi={S\bibinitperiod},
+           given={Alexandre},
+           giveni={A\bibinitperiod}}}%
+        {{hash=b8388eead45ea4429fa88916bc9a6cd5}{%
+           family={Testuggine},
+           familyi={T\bibinitperiod},
+           given={Davide},
+           giveni={D\bibinitperiod}}}%
+        {{hash=ff03033f89dcfb6e7f181829c584da48}{%
+           family={Prasad},
+           familyi={P\bibinitperiod},
+           given={Karthik},
+           giveni={K\bibinitperiod}}}%
+        {{hash=a3d9727961a69bfc277565610af65b60}{%
+           family={Malek},
+           familyi={M\bibinitperiod},
+           given={Mani},
+           giveni={M\bibinitperiod}}}%
+        {{hash=3a9fb26c6b3f0a5d191a899344af775b}{%
+           family={Nguyen},
+           familyi={N\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod}}}%
+        {{hash=91db2b3967ed054c3882d17a9a43f716}{%
+           family={Ghosh},
+           familyi={G\bibinitperiod},
+           given={Sayan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=bcce6929cc46f034e5d0081f0cf3a4e9}{%
+           family={Bharadwaj},
+           familyi={B\bibinitperiod},
+           given={Akash},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e9e3927d00694c400488ec6cc02b0d5b}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Jessica},
+           giveni={J\bibinitperiod}}}%
+        {{hash=22e4fedec69ce5758dc2b71b477dbf20}{%
+           family={Cormode},
+           familyi={C\bibinitperiod},
+           given={Graham},
+           giveni={G\bibinitperiod}}}%
+        {{hash=2eea0075441c4e9acfc378c1345323f2}{%
+           family={Mironov},
+           familyi={M\bibinitperiod},
+           given={Ilya},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{81c14777dd5895917790e7d3515c6ef3}
+      \strng{fullhash}{05fab587ac0f4b58644d334f3343ad61}
+      \strng{fullhashraw}{05fab587ac0f4b58644d334f3343ad61}
+      \strng{bibnamehash}{81c14777dd5895917790e7d3515c6ef3}
+      \strng{authorbibnamehash}{81c14777dd5895917790e7d3515c6ef3}
+      \strng{authornamehash}{81c14777dd5895917790e7d3515c6ef3}
+      \strng{authorfullhash}{05fab587ac0f4b58644d334f3343ad61}
+      \strng{authorfullhashraw}{05fab587ac0f4b58644d334f3343ad61}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2109.12298}
+      \field{title}{Opacus: User-Friendly Differential Privacy Library in PyTorch}
+      \field{year}{2021}
+    \endentry
+    \entry{WangDNORL}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=394d641a0626e0504be74152c455899d}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+        {{hash=4b44bba1743c2ad874f7d960887af663}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={X.},
+           giveni={X\bibinitperiod}}}%
+        {{hash=ca5d8c01ece6364a02e9fe2849da33ed}{%
+           family={Zheng},
+           familyi={Z\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=5ee5d3d5470ac29a2e7c8df70ed54725}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=c2ea79a99236d8aa74b580c91ba24667}{%
+           family={Cai},
+           familyi={C\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{9e0bb28093a7c3159fe418fdd4f67e6e}
+      \strng{fullhash}{89c3a92536918bbb5b65a653f96b37aa}
+      \strng{fullhashraw}{89c3a92536918bbb5b65a653f96b37aa}
+      \strng{bibnamehash}{89c3a92536918bbb5b65a653f96b37aa}
+      \strng{authorbibnamehash}{89c3a92536918bbb5b65a653f96b37aa}
+      \strng{authornamehash}{9e0bb28093a7c3159fe418fdd4f67e6e}
+      \strng{authorfullhash}{89c3a92536918bbb5b65a653f96b37aa}
+      \strng{authorfullhashraw}{89c3a92536918bbb5b65a653f96b37aa}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Applied Sciences}
+      \field{number}{5}
+      \field{title}{DNO-RL: A Reinforcement-Learning-Based Approach to Dynamic Noise Optimization for Differential Privacy}
+      \field{volume}{13}
+      \field{year}{2023}
+      \field{pages}{3235}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.3390/app13053235
+      \endverb
+    \endentry
+    \entry{zhao20233rd}{article}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{10}{}{%
+        {{hash=c16e592968201fed7413e6fa85a80d4d}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Jian},
+           giveni={J\bibinitperiod}}}%
+        {{hash=e313a682fdf592c1688496d25b95c6f5}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Jianan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=05c27065209fca515d01d7301fb08b9f}{%
+           family={Jin},
+           familyi={J\bibinitperiod},
+           given={Lei},
+           giveni={L\bibinitperiod}}}%
+        {{hash=e285970f5047d378c7658b288f66c621}{%
+           family={Chu},
+           familyi={C\bibinitperiod},
+           given={Jiaming},
+           giveni={J\bibinitperiod}}}%
+        {{hash=41f6d19d814364be63c7e7b43a00baa2}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Zhihao},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=2f3ea981fa5a715a69118b48e576a9f5}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Jun},
+           giveni={J\bibinitperiod}}}%
+        {{hash=546ac88876268b522c65a5ecc8c3ceb9}{%
+           family={Xia},
+           familyi={X\bibinitperiod},
+           given={Jiangqiang},
+           giveni={J\bibinitperiod}}}%
+        {{hash=b7567123ad8063ff975519a285490851}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Kai},
+           giveni={K\bibinitperiod}}}%
+        {{hash=621013bf54d3546375ad71f17f020b5b}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=90adc4d9f2cbc21bde092e14cdfdf8fa}{%
+           family={Gulshad},
+           familyi={G\bibinitperiod},
+           given={Sadaf},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{441c1672259c3ced3475775a88172ea1}
+      \strng{fullhash}{ead23b9f2aa89ce2c1d531db8b57accf}
+      \strng{fullhashraw}{ead23b9f2aa89ce2c1d531db8b57accf}
+      \strng{bibnamehash}{441c1672259c3ced3475775a88172ea1}
+      \strng{authorbibnamehash}{441c1672259c3ced3475775a88172ea1}
+      \strng{authornamehash}{441c1672259c3ced3475775a88172ea1}
+      \strng{authorfullhash}{ead23b9f2aa89ce2c1d531db8b57accf}
+      \strng{authorfullhashraw}{ead23b9f2aa89ce2c1d531db8b57accf}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2305.07290}
+      \field{title}{The 3rd Anti-UAV Workshop \& Challenge: Methods and Results}
+      \field{year}{2023}
+    \endentry
+    \entry{ChenAdaptivePrivacyMARL}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=d90f53b6c47cfea3540b0fb9da23dbd7}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=b624faa7396cd10ed0608971e10c5985}{%
+           family={Liao},
+           familyi={L\bibinitperiod},
+           given={G.},
+           giveni={G\bibinitperiod}}}%
+        {{hash=10e128416c333be743279b62e58ef50d}{%
+           family={Ma},
+           familyi={M\bibinitperiod},
+           given={Q.},
+           giveni={Q\bibinitperiod}}}%
+        {{hash=60aeb23a507616b6ae2488ddaab41f0e}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={X.},
+           giveni={X\bibinitperiod}}}%
+      }
+      \strng{namehash}{aba2c5336ef958dec19af0e2c87f30bc}
+      \strng{fullhash}{e232e2e4a7b8444294590ee781828367}
+      \strng{fullhashraw}{e232e2e4a7b8444294590ee781828367}
+      \strng{bibnamehash}{e232e2e4a7b8444294590ee781828367}
+      \strng{authorbibnamehash}{e232e2e4a7b8444294590ee781828367}
+      \strng{authornamehash}{aba2c5336ef958dec19af0e2c87f30bc}
+      \strng{authorfullhash}{e232e2e4a7b8444294590ee781828367}
+      \strng{authorfullhashraw}{e232e2e4a7b8444294590ee781828367}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the IEEE International Conference on Communications (ICC)}
+      \field{title}{Adaptive Privacy Budget Allocation in Federated Learning: A Multi-Agent Reinforcement Learning Approach}
+      \field{year}{2024}
+    \endentry
+    \entry{FangByzantineDecentralizedFL}{inproceedings}{}{}
+      \name{author}{7}{}{%
+        {{hash=e12ee3c716095833e78f918f451c4086}{%
+           family={Fang},
+           familyi={F\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=5ee5d3d5470ac29a2e7c8df70ed54725}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Z.},
+           giveni={Z\bibinitperiod}}}%
+        {{hash=8fa16c94f0daf2570a5b07e0702aa065}{%
+           family={Khanduri},
+           familyi={K\bibinitperiod},
+           given={P.},
+           giveni={P\bibinitperiod}}}%
+        {{hash=7bb074c37d04e2fb30a473aa12102ae1}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod}}}%
+        {{hash=1ef50857e114f08907fb07cb579b5e7e}{%
+           family={Lu},
+           familyi={L\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=ce084360cc68e7db4fe6cae1287b3adf}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=1b0c42b1397a718f553db1ccdc81705f}{%
+           family={Gong},
+           familyi={G\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod}}}%
+      }
+      \strng{namehash}{002a2c2fdef13e99ef27f843ee209658}
+      \strng{fullhash}{fe47a303667f4e7502c59a12bf32c573}
+      \strng{fullhashraw}{fe47a303667f4e7502c59a12bf32c573}
+      \strng{bibnamehash}{002a2c2fdef13e99ef27f843ee209658}
+      \strng{authorbibnamehash}{002a2c2fdef13e99ef27f843ee209658}
+      \strng{authornamehash}{002a2c2fdef13e99ef27f843ee209658}
+      \strng{authorfullhash}{fe47a303667f4e7502c59a12bf32c573}
+      \strng{authorfullhashraw}{fe47a303667f4e7502c59a12bf32c573}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 2024 ACM SIGSAC Conference on Computer and Communications Security (CCS)}
+      \field{note}{Also available as arXiv:2406.10416}
+      \field{title}{Byzantine-Robust Decentralized Federated Learning}
+      \field{year}{2024}
+    \endentry
+    \entry{Li_2024}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=2c680ae69f10f41e60685e06b4c3b668}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Shenghui},
+           giveni={S\bibinitperiod}}}%
+        {{hash=bfa47d5697ed154ef8cd75b94d89b726}{%
+           family={Ngai},
+           familyi={N\bibinitperiod},
+           given={Edith\bibnamedelima C.-H.},
+           giveni={E\bibinitperiod\bibinitdelim C\bibinithyphendelim H\bibinitperiod}}}%
+        {{hash=63e219368d47bd58a7cf120cf7b8085c}{%
+           family={Voigt},
+           familyi={V\bibinitperiod},
+           given={Thiemo},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{publisher}{2}{%
+        {Institute of Electrical}%
+        {Electronics Engineers (IEEE)}%
+      }
+      \strng{namehash}{839ad3ff9a2991c9636f4b83ea56ab68}
+      \strng{fullhash}{165cdf0fa4e732ea17f68024c183fe28}
+      \strng{fullhashraw}{165cdf0fa4e732ea17f68024c183fe28}
+      \strng{bibnamehash}{165cdf0fa4e732ea17f68024c183fe28}
+      \strng{authorbibnamehash}{165cdf0fa4e732ea17f68024c183fe28}
+      \strng{authornamehash}{839ad3ff9a2991c9636f4b83ea56ab68}
+      \strng{authorfullhash}{165cdf0fa4e732ea17f68024c183fe28}
+      \strng{authorfullhashraw}{165cdf0fa4e732ea17f68024c183fe28}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{2372-2096}
+      \field{journaltitle}{IEEE Transactions on Big Data}
+      \field{month}{12}
+      \field{number}{6}
+      \field{title}{An Experimental Study of Byzantine-Robust Aggregation Schemes in Federated Learning}
+      \field{volume}{10}
+      \field{year}{2024}
+      \field{pages}{975\bibrangedash 988}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1109/tbdata.2023.3237397
+      \endverb
+      \verb{urlraw}
+      \verb http://dx.doi.org/10.1109/TBDATA.2023.3237397
+      \endverb
+      \verb{url}
+      \verb http://dx.doi.org/10.1109/TBDATA.2023.3237397
+      \endverb
+    \endentry
+    \entry{10529118}{article}{}{}
+      \name{author}{6}{}{%
+        {{hash=886680df245428b7360123efbaadb010}{%
+           family={Song},
+           familyi={S\bibinitperiod},
+           given={Anxiao},
+           giveni={A\bibinitperiod}}}%
+        {{hash=89f8dc1f53cbeef14987b4fa75966de3}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Haoshuo},
+           giveni={H\bibinitperiod}}}%
+        {{hash=d3e3169f78baa80ee2d5e4cf3e617e1b}{%
+           family={Cheng},
+           familyi={C\bibinitperiod},
+           given={Ke},
+           giveni={K\bibinitperiod}}}%
+        {{hash=228dd687961f3612985beeddec81f72a}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Tao},
+           giveni={T\bibinitperiod}}}%
+        {{hash=bfa8dba3034b1196d96e66c1d9934040}{%
+           family={Sun},
+           familyi={S\bibinitperiod},
+           given={Aijing},
+           giveni={A\bibinitperiod}}}%
+        {{hash=26aefe4ea0177147306646769358cdb2}{%
+           family={Shen},
+           familyi={S\bibinitperiod},
+           given={Yulong},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{73645ed97614ba75d720a8cbb74d45c7}
+      \strng{fullhash}{ab2aa78be4c273dbe13468246afffedf}
+      \strng{fullhashraw}{ab2aa78be4c273dbe13468246afffedf}
+      \strng{bibnamehash}{ab2aa78be4c273dbe13468246afffedf}
+      \strng{authorbibnamehash}{ab2aa78be4c273dbe13468246afffedf}
+      \strng{authornamehash}{73645ed97614ba75d720a8cbb74d45c7}
+      \strng{authorfullhash}{ab2aa78be4c273dbe13468246afffedf}
+      \strng{authorfullhashraw}{ab2aa78be4c273dbe13468246afffedf}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Internet of Things Journal}
+      \field{number}{16}
+      \field{title}{Guard-FL: An UMAP-Assisted Robust Aggregation for Federated Learning}
+      \field{volume}{11}
+      \field{year}{2024}
+      \field{pages}{27557\bibrangedash 27570}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.1109/JIOT.2024.3399259
+      \endverb
+      \keyw{Internet of Things;Data models;Servers;Manifolds;Federated learning;Dimensionality reduction;Principal component analysis;Byzantine attack;federated learning (FL);information stored in weights (IIWs);nonindependent identically distributed (non-IID);uniform manifold approximation and projection (UMAP)}
+    \endentry
+    \entry{HossainDynamicDifferentialPoisoning}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=8a11e21a4ba0ab733c776741a67e7174}{%
+           family={Hossain},
+           familyi={H\bibinitperiod},
+           given={M.\bibnamedelimi T.},
+           giveni={M\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=571607de906c41bb6750645b567bdda7}{%
+           family={Badsha},
+           familyi={B\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=5f9c8949344ca11b1a364bfade94b930}{%
+           family={La},
+           familyi={L\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod}}}%
+        {{hash=b8fbdcebc28145a973312fe0f1466582}{%
+           family={Islam},
+           familyi={I\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=1508c3ba7dc2cd421b910333c9915613}{%
+           family={Khalil},
+           familyi={K\bibinitperiod},
+           given={I.},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{7f8c817c993da65217a04dbc985bffbd}
+      \strng{fullhash}{32646a4bae665e636feb1ebeba4ca6d9}
+      \strng{fullhashraw}{32646a4bae665e636feb1ebeba4ca6d9}
+      \strng{bibnamehash}{32646a4bae665e636feb1ebeba4ca6d9}
+      \strng{authorbibnamehash}{32646a4bae665e636feb1ebeba4ca6d9}
+      \strng{authornamehash}{7f8c817c993da65217a04dbc985bffbd}
+      \strng{authorfullhash}{32646a4bae665e636feb1ebeba4ca6d9}
+      \strng{authorfullhashraw}{32646a4bae665e636feb1ebeba4ca6d9}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Artificial Intelligence}
+      \field{number}{11}
+      \field{title}{Exploiting Gaussian Noise Variance for Dynamic Differential Poisoning in Federated Learning}
+      \field{volume}{6}
+      \field{year}{2025}
+      \field{pages}{2922\bibrangedash 2939}
+      \range{pages}{18}
+    \endentry
+    \entry{SzelagaAdaptiveAdversariesSurvey}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=cda54d39b11db013b641ddcf2c2d2969}{%
+           family={Szeląga},
+           familyi={S\bibinitperiod},
+           given={J.\bibnamedelimi K.},
+           giveni={J\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=4dc8c0e2a63e0a1b75abfa36ac412cca}{%
+           family={China},
+           familyi={C\bibinitperiod},
+           given={J.-J.},
+           giveni={J\bibinithyphendelim J\bibinitperiod}}}%
+        {{hash=fdb8563c724ab722965487965b5631b0}{%
+           family={Yip},
+           familyi={Y\bibinitperiod},
+           given={S.-C.},
+           giveni={S\bibinithyphendelim C\bibinitperiod}}}%
+      }
+      \list{institution}{2}{%
+        {University of Plymouth}%
+        {Multimedia University}%
+      }
+      \strng{namehash}{b66f7f9a43c7a85f69b051dd97c857e3}
+      \strng{fullhash}{ec0d4853ec736a4010272238bd37e4a1}
+      \strng{fullhashraw}{ec0d4853ec736a4010272238bd37e4a1}
+      \strng{bibnamehash}{ec0d4853ec736a4010272238bd37e4a1}
+      \strng{authorbibnamehash}{ec0d4853ec736a4010272238bd37e4a1}
+      \strng{authornamehash}{b66f7f9a43c7a85f69b051dd97c857e3}
+      \strng{authorfullhash}{ec0d4853ec736a4010272238bd37e4a1}
+      \strng{authorfullhashraw}{ec0d4853ec736a4010272238bd37e4a1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{ePrint IACR 2025/510}
+      \field{title}{Adaptive Adversaries in Byzantine-Robust Federated Learning: A Survey}
+      \field{year}{2025}
+    \endentry
+    \entry{ZafarGANRobustFL}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=833ff6d24faa10957cf29fd3fdc3273f}{%
+           family={Zafar},
+           familyi={Z\bibinitperiod},
+           given={U.},
+           giveni={U\bibinitperiod}}}%
+        {{hash=5129813dc18a7a50dbef566514a73cfb}{%
+           family={Teixeira},
+           familyi={T\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=970ebdc068527c101d0992c955fc2b29}{%
+           family={Toor},
+           familyi={T\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{b84981ff77a2964f632bba18aba9c566}
+      \strng{fullhash}{6d919d672b30283b98da2ed5e3ffdf64}
+      \strng{fullhashraw}{6d919d672b30283b98da2ed5e3ffdf64}
+      \strng{bibnamehash}{6d919d672b30283b98da2ed5e3ffdf64}
+      \strng{authorbibnamehash}{6d919d672b30283b98da2ed5e3ffdf64}
+      \strng{authornamehash}{b84981ff77a2964f632bba18aba9c566}
+      \strng{authorfullhash}{6d919d672b30283b98da2ed5e3ffdf64}
+      \strng{authorfullhashraw}{6d919d672b30283b98da2ed5e3ffdf64}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{arXiv preprint arXiv:2503.20884}
+      \field{title}{Robust Federated Learning Against Poisoning Attacks: A GAN-Based Defense Framework}
+      \field{year}{2025}
+    \endentry
+    \entry{HafeezFDRLRoboticSurgery}{misc}{}{}
+      \name{author}{4}{}{%
+        {{hash=4ae02f2f14507a17e26971a4d709bcd5}{%
+           family={Hafeez},
+           familyi={H\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=66377ef271264fd3422f8a53823e4d68}{%
+           family={Mulkana},
+           familyi={M\bibinitperiod},
+           given={S.\bibnamedelimi R.},
+           giveni={S\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=ddde00968360534b7668c6f696ac5b36}{%
+           family={Imran},
+           familyi={I\bibinitperiod},
+           given={M.\bibnamedelimi A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=2082e42d0b6edd6c6c6a55ea9f5c5cec}{%
+           family={Sevegnani},
+           familyi={S\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {University of Glasgow}%
+      }
+      \strng{namehash}{bba273a314628491d8acb9e8b3e34ff5}
+      \strng{fullhash}{338a4226b2b85b08eda2230edcd7bfba}
+      \strng{fullhashraw}{338a4226b2b85b08eda2230edcd7bfba}
+      \strng{bibnamehash}{338a4226b2b85b08eda2230edcd7bfba}
+      \strng{authorbibnamehash}{338a4226b2b85b08eda2230edcd7bfba}
+      \strng{authornamehash}{bba273a314628491d8acb9e8b3e34ff5}
+      \strng{authorfullhash}{338a4226b2b85b08eda2230edcd7bfba}
+      \strng{authorfullhashraw}{338a4226b2b85b08eda2230edcd7bfba}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Unpublished manuscript}
+      \field{title}{Federated Deep Reinforcement Learning for Privacy-Preserving Robotic-Assisted Surgery}
+    \endentry
+    \entry{ZhouConcurrentFRLIoT}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=8bee622d1b143f26fb1aa74b61da290a}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={W.},
+           giveni={W\bibinitperiod}}}%
+        {{hash=4384032fd4cd9930b51f4647a8b4edb4}{%
+           family={Zhu},
+           familyi={Z\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod}}}%
+        {{hash=1bca015dfefb635366b3af784b148b92}{%
+           family={Ye},
+           familyi={Y\bibinitperiod},
+           given={D.},
+           giveni={D\bibinitperiod}}}%
+        {{hash=e92e39dc5ac509174e9cea4307cb09a7}{%
+           family={Ren},
+           familyi={R\bibinitperiod},
+           given={W.},
+           giveni={W\bibinitperiod}}}%
+        {{hash=be320798e15e70046243da310750f38e}{%
+           family={Choo},
+           familyi={C\bibinitperiod},
+           given={K.-K.\bibnamedelimi R.},
+           giveni={K\bibinithyphendelim K\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{eb11394e5446e6298a35a20d2d8b46be}
+      \strng{fullhash}{034731aa85408af5a2ea875e1ff7089f}
+      \strng{fullhashraw}{034731aa85408af5a2ea875e1ff7089f}
+      \strng{bibnamehash}{034731aa85408af5a2ea875e1ff7089f}
+      \strng{authorbibnamehash}{034731aa85408af5a2ea875e1ff7089f}
+      \strng{authornamehash}{eb11394e5446e6298a35a20d2d8b46be}
+      \strng{authorfullhash}{034731aa85408af5a2ea875e1ff7089f}
+      \strng{authorfullhashraw}{034731aa85408af5a2ea875e1ff7089f}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE}
+      \field{title}{A Concurrent Federated Reinforcement Learning for IoT Resource Allocation with Local Differential Privacy}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

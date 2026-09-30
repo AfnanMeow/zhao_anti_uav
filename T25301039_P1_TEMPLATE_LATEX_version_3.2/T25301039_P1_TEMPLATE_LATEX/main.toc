@@ -1,0 +1,65 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Declaration}{i}{section*.1}%
+\contentsline {chapter}{Approval}{ii}{section*.3}%
+\contentsline {chapter}{Abstract}{iii}{section*.5}%
+\contentsline {chapter}{Dedication}{iv}{section*.7}%
+\contentsline {chapter}{Table of Contents}{v}{section*.9}%
+\contentsline {chapter}{List of Figures}{vii}{chapter*.11}%
+\contentsline {chapter}{List of Tables}{viii}{chapter*.12}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Motivation}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Problem Statement}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Research Objectives}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Contributions}{2}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Scope and Limitations}{3}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Thesis Organisation}{3}{section.1.7}%
+\contentsline {chapter}{\numberline {2}Literature Review}{4}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Differentially Private Federated Learning}{4}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Adaptive Privacy Budget Allocation}{4}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Byzantine-Robust Aggregation}{5}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Poisoning that Exploits DP Noise}{5}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Federated Reinforcement Learning under Privacy Constraints}{6}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Gap Addressed}{6}{section.2.6}%
+\contentsline {chapter}{\numberline {3}Preliminaries, System Model and Theory}{7}{chapter.3}%
+\contentsline {section}{\numberline {3.1}System Model}{7}{section.3.1}%
+\contentsline {section}{\numberline {3.2}The Optimality of Uniform Allocation}{7}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Statement}{7}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Why the Motivating Intuition Fails}{8}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Extension to Other Allocation Axes}{8}{subsection.3.2.3}%
+\contentsline {paragraph}{Across layers.}{8}{section*.13}%
+\contentsline {paragraph}{Across clients.}{9}{section*.14}%
+\contentsline {subsection}{\numberline {3.2.4}Consequence for Learned Allocators}{9}{subsection.3.2.4}%
+\contentsline {chapter}{\numberline {4}Experimental Design}{10}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Dataset and Partitioning}{10}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Model: Public Trunk, Private Head}{10}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Locating the Informative Regime}{11}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Verifying the Theorem's Assumption}{12}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Threat Model for the Poisoning Study}{13}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Statistical Protocol}{14}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Implementation Provenance}{14}{section.4.7}%
+\contentsline {chapter}{\numberline {5}Results}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Allocation Across Rounds}{15}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Power-Law Schedules}{15}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}A Mild Front-Load}{15}{subsection.5.1.2}%
+\contentsline {subsection}{\numberline {5.1.3}Beyond the Power Family}{16}{subsection.5.1.3}%
+\contentsline {subsection}{\numberline {5.1.4}One Scalar Explains Everything}{16}{subsection.5.1.4}%
+\contentsline {subsection}{\numberline {5.1.5}Tight Privacy Budgets}{17}{subsection.5.1.5}%
+\contentsline {subsection}{\numberline {5.1.6}The Learned Allocator in Practice}{18}{subsection.5.1.6}%
+\contentsline {paragraph}{An evaluation artefact worth recording.}{19}{section*.24}%
+\contentsline {subsection}{\numberline {5.1.7}A Note on What Is Not Being Claimed}{20}{subsection.5.1.7}%
+\contentsline {section}{\numberline {5.2}Byzantine Resilience under Differential Privacy}{21}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}The Honest Update Envelope}{21}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Attacks and Defences}{21}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Results}{22}{subsection.5.2.3}%
+\contentsline {paragraph}{The published attack asymmetry reproduces.}{22}{section*.29}%
+\contentsline {paragraph}{The architecture is inherently resilient.}{22}{section*.30}%
+\contentsline {paragraph}{Classical robust aggregators are counterproductive under DP.}{22}{section*.31}%
+\contentsline {chapter}{\numberline {6}Discussion and Conclusion}{25}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Summary of Findings}{25}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Implications for Practice}{25}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Implications for the Literature}{26}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Limitations}{26}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Future Work}{27}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Conclusion}{27}{section.6.6}%
+\contentsline {chapter}{Bibliography}{29}{chapter*.37}%

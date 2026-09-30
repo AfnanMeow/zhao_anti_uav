@@ -1,0 +1,17 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Adaptive optimisers normalise the privacy parameter away. A sixteen-fold change in $\sigma $ moves final accuracy by $0.016$ under Adam and $0.064$ under SGD, with the SGD degradation monotone in both noise and rounds.}}{11}{figure.caption.15}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces The calibrated operating regime. Accuracy is genuinely sensitive to the noise multiplier across the source method's operating range $\sigma \in [1,20]$, which is the precondition for any allocation study. Floor and ceiling are marked.}}{12}{figure.caption.17}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Accumulated noise variance $\DOTSB \sum@ \slimits@ _t\sigma _t^2$ orders every allocation tested, across power-law, bang-bang and random-simplex families. Uniform is the analytic minimum.}}{17}{figure.caption.20}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Left: the penalty for deviating from uniform shrinks toward the collapse threshold but never flips sign. Right: paired-difference noise grows faster than the candidate effect.}}{18}{figure.caption.22}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Detection accuracy against communication round for the learned allocator and the three fixed baselines, mean over 8 paired trials with $\pm 1$ standard deviation bands, scored on held-out data.}}{20}{figure.caption.25}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces The noise schedule the agent actually learned, against the three fixed schedules. The learned policy is non-uniform, which by Theorem~\ref {thm:uniform} is the reason it underperforms.}}{20}{figure.caption.26}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Defence comparison at $m=30\%$ malicious clients.}}{23}{figure.caption.32}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Detection rate against malicious ratio, and the false-positive cost borne by honest clients.}}{23}{figure.caption.33}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Poisoning degree $\gamma $ over rounds: the attacker escalates when undetected and retreats when caught.}}{24}{figure.caption.34}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Accuracy trajectories with and without robust aggregation.}}{24}{figure.caption.35}%
+\addvspace {10\p@ }

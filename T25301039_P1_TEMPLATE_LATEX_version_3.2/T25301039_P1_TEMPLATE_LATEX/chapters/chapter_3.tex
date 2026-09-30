@@ -1,0 +1,149 @@
+\section{System Model}
+
+$N$ clients hold disjoint data shards. In round $t$ the server broadcasts global
+parameters $w_t$; each client runs $E$ local epochs of DP-SGD with batch size
+$B$ and noise multiplier $\sigma_t$, and returns its update $\Delta_i^{(t)}$.
+The server aggregates and forms $w_{t+1}$.
+
+\vspace{10pt}
+
+Within a local epoch, each per-sample gradient $g_i$ is clipped to a norm $C$,
+\begin{equation}
+  \bar{g}_i \;=\; g_i \cdot \min\!\left(1, \frac{C}{\lVert g_i \rVert_2}\right),
+  \label{eq:clip}
+\end{equation}
+the clipped gradients are averaged over the batch, and Gaussian noise of scale
+$\sigma_t C$ is added before the local parameter update. Per-round privacy cost
+in zero-concentrated DP \cite{bun2016concentrated} is
+\begin{equation}
+  \rho_t \;=\; \frac{2E}{\sigma_t^{2}},
+  \qquad\text{equivalently}\qquad
+  \sigma_t \;=\; \sqrt{\frac{2E}{\rho_t}},
+  \label{eq:budget}
+\end{equation}
+and the client's constraint is $\sum_{t=1}^{T}\rho_t = \rho$. Because zCDP costs
+add across rounds, the allocation $\{\rho_t\}$ is exactly the object a scheduler
+controls.
+
+\section{The Optimality of Uniform Allocation}
+\label{sec:theory}
+
+\subsection{Statement}
+
+\begin{theorem}[Uniform allocation is optimal]
+\label{thm:uniform}
+Assume (i) per-sample clipping binds, so each round contributes at most $C$ of
+signal regardless of $\sigma_t$; (ii) the noise injected in distinct rounds is
+independent; and (iii) utility is non-increasing in the noise variance
+accumulated into the final model. Then, for fixed $T$ and $\sum_t\rho_t=\rho$,
+the accumulated noise variance is minimised by $\rho_t = \rho/T$ for all $t$,
+and strictly increased by any departure from it.
+\end{theorem}
+
+\begin{proof}
+Noise enters the model additively and independently across rounds, so the
+accumulated variance is proportional to
+\begin{equation}
+  V(\{\rho_t\}) \;=\; \sum_{t=1}^{T}\sigma_t^{2}
+  \;=\; 2E\sum_{t=1}^{T}\frac{1}{\rho_t}.
+  \label{eq:variance}
+\end{equation}
+By assumption~(i) the signal term is independent of $\{\rho_t\}$, so the
+allocation affects utility only through $V$. Since $x\mapsto 1/x$ is strictly
+convex on $\mathbb{R}_{>0}$, Jensen's inequality, equivalently the
+arithmetic-harmonic mean inequality, gives
+\begin{equation}
+  \sum_{t=1}^{T}\frac{1}{\rho_t} \;\ge\; \frac{T^{2}}{\sum_t \rho_t}
+  \;=\; \frac{T^{2}}{\rho},
+  \label{eq:amhm}
+\end{equation}
+with equality if and only if all $\rho_t$ are equal. Hence $V$ attains its
+unique minimum $2ET^{2}/\rho$ at the uniform allocation, and any departure
+strictly increases it.
+\end{proof}
+
+\vspace{10pt}
+
+The result is deliberately stated in terms of accumulated variance rather than
+final accuracy, because that is the quantity the mechanism determines exactly.
+Assumption~(iii) is what connects it to utility, and it is the weakest of the
+three: it is an assumption of monotonicity, not of any particular functional
+form. Section~\ref{sec:results-tight} tests it directly near the collapse
+threshold, where it is most vulnerable, and finds that it weakens but never
+inverts.
+
+\subsection{Why the Motivating Intuition Fails}
+
+The adaptive-allocation argument assumes that the signal contributed per round
+varies with training progress. Assumption~(i) removes exactly that variation:
+under per-sample clipping every round contributes at most $C$, whether its true
+gradients are large or small. The premise is therefore not merely unsupported in
+this setting, it is incompatible with the DP-SGD mechanism the method is built
+on.
+
+\vspace{10pt}
+
+This is an empirical claim about a measurable quantity, not a modelling
+convenience, and Section~\ref{sec:clipbinds} measures it in two settings: our
+own detector, where clipping binds by a factor of $27$, and the small
+convolutional network and clipping norm used by the source method on CIFAR-10,
+where it binds by a factor of $8$. It also shows that the per-sample gradient
+norm \emph{grows} rather than shrinks over training in that configuration, so
+the quantity the intuition relies on moves in the opposite direction to the one
+assumed before clipping discards it.
+
+\subsection{Extension to Other Allocation Axes}
+
+The same inequality closes two further axes along which a budget might be
+allocated, neither of which requires an additional experiment.
+
+\paragraph{Across layers.}
+Partition the model into groups $g$ of $D_g$ parameters with per-group
+multipliers $\sigma_g$. The zCDP cost of a Gaussian release with per-group
+scales is $\rho=\tfrac12\sum_g \sigma_g^{-2}$ and the accumulated variance is
+$V=\sum_g \sigma_g^{2}D_g$. Minimising $V$ subject to the budget gives
+$\rho_g \propto \sqrt{D_g}$ and $V_{\min} = \left(\sum_g\sqrt{D_g}\right)^{2}/2\rho$,
+whereas a single global clip achieves $D_{\text{tot}}/2\rho$. Since
+$\left(\sum_g \sqrt{D_g}\right)^{2}\ge \sum_g D_g$ by Cauchy--Schwarz, with
+equality only in the degenerate single-group case, \emph{splitting is always
+worse}: one pays composition for every group released separately. For the
+$k_1/k_2/\text{head}$ partition used here the best possible per-layer scheme is
+$2.37\times$ worse than a single global clip ($1{,}345{,}614$ against
+$566{,}789$ in units of accumulated variance).
+
+\paragraph{Across clients.}
+With FedAvg over $N$ clients the accumulated variance is
+\begin{equation}
+  V \;=\; \frac{1}{N^{2}}\sum_{i=1}^{N}\sum_{t=1}^{T} \sigma_{i,t}^{2},
+  \label{eq:clients}
+\end{equation}
+subject to a \emph{separate} constraint $\sum_t\rho_{i,t}=\rho_i$ for each
+client, since a privacy budget is a property of a data owner and cannot be
+transferred between them. The objective therefore separates across $i$, so each
+client independently faces Theorem~\ref{thm:uniform} and should be uniform in
+time at its own level. There is no cross-client structure for a
+credit-assignment mechanism such as a value-decomposition network to discover.
+
+\subsection{Consequence for Learned Allocators}
+\label{sec:consequence}
+
+A learned policy cannot exceed the best allocation available to it. The
+published agent's state $(t,\rho_k)$ contains no model feedback
+\cite{ChenAdaptivePrivacyMARL}, so for a fixed budget its policy is a
+deterministic function of $t$, that is, a fixed schedule, which is exactly the
+class Theorem~\ref{thm:uniform} covers. The bound applies to the method as
+published, not merely to the hand-designed schedules tested in
+Chapter~5. Section~\ref{sec:drl-practice} confirms this empirically by training
+the agent and running it against the baselines it was designed to beat.
+
+\vspace{10pt}
+
+Reward shaping does not change this. Potential-based shaping provably preserves
+the optimal policy \cite{ng1999policy}, so it cannot move the optimum; and
+redefining the reward to something other than utility optimises a different
+objective, which answers a different question. The only escape is a strictly
+larger policy class, for example a state containing model feedback such as the
+current loss or realised gradient norm, which can react to the noise actually
+drawn rather than committing to a schedule in advance. That class is not covered
+by the theorem, and Section~\ref{sec:future} identifies it as the natural next
+question.

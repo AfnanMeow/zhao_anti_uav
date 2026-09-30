@@ -1,0 +1,57 @@
+% Following command is used to created grouped signature line for Four Authors
+\newcommand*\wildcard[2][6cm]{\vspace{2cm}\parbox{#1}{\hrulefill\par#2}} 
+
+% Custom command for signature with optional PNG
+% Alternative simpler approach
+\newcommand{\sigwithimage}[3][6cm]{
+    \parbox{#1}{
+        \centering
+        \IfFileExists{#2}{
+            \includegraphics[height=2.5 cm, width=5.065 cm]{#2}\\
+        }{}
+        \vspace{0.003cm}
+        \hrulefill{}\\
+        #3
+    }
+}
+
+% A "parbox{}{}" is a box whose contents are created in paragraph mode. 
+% "hrulefill{} to chance thickness of underline"
+
+\section*{Declaration}
+
+It is hereby declared that
+
+\begin{enumerate} % begin{enumerate} function to create numbered list
+  \item The thesis submitted is my/our own original work while completing degree at Brac University.
+  \item The thesis does not contain material previously published or written by a third party, except where this is appropriately cited through full and accurate referencing.
+  \item The thesis does not contain material which has been accepted, or submitted, for any other degree or diploma at a university or other institution.
+  \item We have acknowledged all main sources of help.
+\end{enumerate}
+
+\vspace{1cm}
+\textbf{Student's Full Name \& Signature:} % Testbf{} for Bold
+
+\begingroup
+
+    \begin{center}
+        % Replace "signature_afnan.png" with actual PNG filenames
+        \sigwithimage{signatures/signatures_meow.png}{Afnan Satter \\ 22201765}
+        \hspace{2cm}
+         \sigwithimage{signatures/signatures_poe.png}{Rabsa Anjum Prosongsha \\ 24241347}
+        
+        
+        \vspace{1.5cm} % Additional vertical space between rows
+        
+        \sigwithimage{signatures/signatures_moh.png}{Mohsina Binte Harun \\ 24301586}
+        \hspace{2cm}
+        \sigwithimage{signatures/signatures_riv.png}{Masrura Nahian Nodi \\ 22201421}
+        
+        \vspace{1.5cm} % Additional vertical space between rows
+        
+        \sigwithimage{signatures/signatures_nida.png}{Tasnim Nida \\ 22201954}
+    \end{center}
+
+\endgroup
+
+\pagebreak

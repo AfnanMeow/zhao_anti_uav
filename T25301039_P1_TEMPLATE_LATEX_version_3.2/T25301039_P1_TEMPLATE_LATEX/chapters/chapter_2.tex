@@ -1,0 +1,143 @@
+\section{Differentially Private Federated Learning}
+
+Federated averaging \cite{mcmahan2017communication} trains a shared model
+without pooling data, but the updates themselves leak information. DP-SGD
+\cite{abadi2016deep} closes that gap by clipping per-sample gradients to a norm
+$C$ and adding Gaussian noise of scale $\sigma C$, giving a per-step guarantee
+that composes across steps. In FL this composition runs over communication
+rounds, so a client with a fixed total budget faces a scheduling decision.
+Accounting is commonly expressed in zero-concentrated DP
+\cite{bun2016concentrated}, under which per-round costs add. All DP mechanisms
+in this work are implemented with Opacus \cite{opacus2021}.
+
+\vspace{10pt}
+
+The utility cost of DP is severe for dense prediction tasks. Where a classifier
+must place a single label, a detector must localise objects that may occupy a
+handful of pixels, and the gradient signal supporting that localisation is small
+relative to the injected noise. This is the regime in which the present work
+operates, and Section~\ref{sec:calibration} shows that it is also the regime in
+which most configurations are uninformative: DP-training an entire detector
+destroys it, while DP-training only a small head on frozen public features makes
+the noise irrelevant.
+
+\section{Adaptive Privacy Budget Allocation}
+
+\citeauthor{ChenAdaptivePrivacyMARL} \cite{ChenAdaptivePrivacyMARL} formulate
+per-round allocation as a decentralised partially observable Markov decision
+process, with one agent per client, state $(t,\rho_k)$, continuous action
+$\sigma\in[\sigma_{\min},\sigma_{\max}]$, and reward the change in global
+accuracy. They employ DDPG \cite{lillicrap2016continuous} with parameter sharing
+and a value-decomposition network \cite{sunehag2018value}, and report gains over
+uniform, arithmetic and exponential baselines: $91.05\%$ versus $88.03\%$ on
+MNIST and $47.75\%$ versus $47.6\%$ on CIFAR-10.
+
+\vspace{10pt}
+
+Two features of that setup matter here. The reported CIFAR-10 gain is
+$0.15$ percentage points, roughly $0.3\%$ relative, and is published without
+error bars; and the agent's state contains no model feedback, so for a fixed
+budget its policy is a deterministic function of $t$, that is, a fixed schedule.
+The optimality result of Section~\ref{sec:theory} therefore bounds the published
+method directly rather than merely bounding hand-designed schedules.
+
+\vspace{10pt}
+
+A related line of work adapts the noise scale from observed training dynamics
+rather than from a learned policy over the budget. \citeauthor{WangDNORL}
+\cite{WangDNORL} propose DNO-RL, in which a reinforcement-learning agent
+monitors gradient norms and loss variation and modulates the Gaussian noise
+scale online, reporting a better privacy-utility trade-off than fixed-rate
+schedules. Because its state includes model feedback, this family is not
+strictly covered by our bound; Section~\ref{sec:future} returns to that
+distinction, which is the one route by which a learned controller could still
+escape the result proved here.
+
+\section{Byzantine-Robust Aggregation}
+
+FedAvg has breakdown point zero: a single client can move the mean arbitrarily.
+Robust aggregators replace the mean with a statistic that tolerates outliers.
+Coordinate-wise median and trimmed mean \cite{yin2018byzantine} operate
+per-coordinate; Krum \cite{blanchard2017machine} selects the single update
+closest to its nearest neighbours; geometric-median variants interpolate between
+the two. Their guarantees are derived without differential privacy in the loop,
+and Section~\ref{sec:p3-results} shows that this assumption matters: under DP
+these aggregators discard the averaging that suppresses the injected noise, and
+can cost more accuracy than the attacks they defend against.
+
+\vspace{10pt}
+
+An orthogonal family detects and excludes anomalous updates before averaging.
+\citeauthor{Li_2024} \cite{Li_2024} evaluate such schemes systematically,
+clipping update norms adaptively with a threshold set to the median of
+historical norms and then clustering by cosine similarity; the approach removes
+the need for manual threshold tuning but degrades sharply under strongly
+non-IID partitions. \citeauthor{10529118} \cite{10529118} reduce updates
+with UMAP before clustering, reporting complete detection of sign-flipping and
+LIE attacks at substantial server-side cost. \citeauthor{ZafarGANRobustFL}
+\cite{ZafarGANRobustFL} avoid the need for a root dataset by training a
+conditional GAN on the server to synthesise validation data. Common to this
+family is that detection quality is reported far more often than the
+false-positive cost borne by honest clients, a gap the present work addresses
+explicitly in Table~\ref{tab:p3}.
+
+\vspace{10pt}
+
+Decentralised variants remove the server entirely.
+\citeauthor{FangByzantineDecentralizedFL}
+\cite{FangByzantineDecentralizedFL} propose a robust local aggregation filter
+over a peer-to-peer graph that tightens as training proceeds, tolerating a large
+malicious fraction but assuming benign-subgraph connectivity and providing no
+protection against leakage during neighbour exchange.
+
+\section{Poisoning that Exploits DP Noise}
+
+\citeauthor{HossainDynamicDifferentialPoisoning}
+\cite{HossainDynamicDifferentialPoisoning} observe that DP's own noise gives an
+attacker cover: a detector must widen its acceptance band to admit honest noisy
+updates, and that width is where adversarial perturbation can hide. They
+introduce $\alpha$-MPELM, an adaptive attack that tunes a poisoning degree
+$\gamma$ from memorised loss history, and show that it deceives norm, accuracy
+and mixed detectors more effectively than random malicious device (RMD) attacks.
+Their evaluation uses small models. Section~\ref{sec:p3-envelope} shows that the
+premise is dimension-dependent: the relative spread of the honest update norm
+scales as $1/\sqrt{2D}$, so the hiding room the attack relies on shrinks as the
+model grows, and at detector scale it is absent.
+
+\vspace{10pt}
+
+A parallel concern is the adaptivity of the adversary rather than its
+concealment. \citeauthor{SzelagaAdaptiveAdversariesSurvey}
+\cite{SzelagaAdaptiveAdversariesSurvey} show that clients which re-enter the
+federation while switching attack strategies defeat defences tuned to a single
+fixed threat, though their evaluation is confined to small feedforward models
+and IID partitions.
+
+\section{Federated Reinforcement Learning under Privacy Constraints}
+
+Reinforcement learning appears in this literature in a second role, as the
+learning task being federated rather than the controller of the privacy budget.
+\citeauthor{ZhuoFederatedDRL} \cite{ZhuoFederatedDRL} share only noised outputs
+of local Q-networks, reaching centralised policy quality without exchanging raw
+observations, but requiring shared transition identifiers and demonstrating only
+two-party federations. \citeauthor{ZhouConcurrentFRLIoT}
+\cite{ZhouConcurrentFRLIoT} apply local DP to edge resource allocation and
+observe that the injected noise can act as a regulariser, while conceding that
+utility degrades as the number of noisy edge hosts grows.
+\citeauthor{HafeezFDRLRoboticSurgery} \cite{HafeezFDRLRoboticSurgery} combine
+DP-SGD with homomorphic encryption for robotic-assisted surgery, with fixed
+privacy parameters and a cooperative threat model. These works establish that DP
+and federated RL compose in practice, but none of them treats the allocation of
+the budget over rounds as the object of study.
+
+\section{Gap Addressed}
+
+The allocation literature optimises a quantity whose optimum has not been
+characterised, and evaluates candidate policies at effect sizes comparable to
+the run-to-run variance of the experiments used to measure them. The poisoning
+literature assumes a camouflage effect whose magnitude depends on a model
+dimension that is not controlled for. This thesis addresses both: it solves the
+allocation problem in closed form and tests the solution under a paired protocol
+precise enough to resolve the effect sizes at stake, and it measures the honest
+update envelope directly at a dimension three orders of magnitude above the
+models in which the camouflage premise was established.

@@ -1,0 +1,43 @@
+\section*{Abstract}
+
+Differentially private federated learning (DP-FL) requires each client to spend a
+finite privacy budget across communication rounds, and a growing literature
+proposes learning \emph{how} to spend it, allocating more noise to rounds that
+tolerate it and less to rounds that do not. We show that for the dominant class
+of DP-FL mechanisms this optimisation is vacuous. Under per-sample gradient
+clipping, each round's contribution to the model is bounded by the clipping norm
+$C$ irrespective of the noise scale, so the allocation influences only the noise
+term; minimising the accumulated noise variance subject to a fixed budget is then
+a convex problem whose solution is the \emph{uniform} allocation. Any non-uniform
+schedule is strictly worse, and the penalty grows with the distance of the
+schedule from that minimum.
+
+We validate this on federated thermal anti-UAV detection with a
+566,789-parameter differentially private detector. Across 13 distinct
+allocations spanning three unrelated schedule families, power-law, bang-bang,
+and random draws from the budget simplex, a single scalar, the accumulated noise
+variance $\sum_t\sigma_t^2$, orders every outcome (Spearman $\rho=-0.767$,
+$p=0.0022$). Uniform sits at the analytic minimum and is never beaten: the best
+alternative we found is bounded above by $+0.0003$ IoU$_{.25}$ at $n{=}16$ paired
+trials with common random numbers. The same inequality closes allocation across
+layers and across clients.
+
+We then study the security of this architecture under model poisoning and report
+a second consequence of high dimensionality. The camouflage on which
+DP-exploiting poisoning attacks depend, hiding adversarial perturbation inside
+the legitimate noise envelope, requires the honest update norm to be variable.
+In $D$ dimensions a Gaussian norm concentrates as $1/\sqrt{2D}$, and we measure a
+relative standard deviation of $0.10\%$ at $D=566{,}789$, matching theory. DP
+noise therefore makes the update norm \emph{more} predictable, capping the
+amplitude available to an attacker: the worst undefended degradation we observe
+at $30\%$ malicious clients is $2.7\%$ relative. Combined norm-plus-accuracy
+detection removes it entirely, at the cost of rejecting $28\%$ of honest
+contributions, whereas classical Byzantine-robust aggregators are
+counterproductive under DP: coordinate-wise median costs $-0.208$ IoU$_{.25}$
+\emph{with no attacker present}, because averaging is precisely the operation
+that suppresses DP noise.
+
+\vspace{1cm}
+\textbf{Keywords:} Federated Learning; Differential Privacy; Privacy Budget
+Allocation; Byzantine Resilience; Model Poisoning; UAV Detection
+\pagebreak

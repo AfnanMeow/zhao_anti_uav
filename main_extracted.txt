@@ -1,0 +1,1915 @@
+A MARL Framework for Adaptive Differential Privacy in
+Byzantine-Resilient Federated Learning
+by
+Afnan Satter
+22201765
+Rabsa Anjum Prosongsha
+24241347
+Masrura Nahian Nodi
+22201421
+Mohsina Binte Harun
+24301586
+Tasnim Nida
+22201954
+A thesis submitted to the Department of Computer Science and Engineering
+in partial fulfillment of the requirements for the degree of
+B.Sc. in Computer Science and Engineering
+Department of Computer Science and Engineering
+Brac University
+January 2026.
+©2024. Brac University
+All rights reserved.
+Declaration
+It is hereby declared that
+1. The thesis submitted is my/our own original work while completing degree at
+Brac University.
+2. The thesis does not contain material previously published or written by a
+third party, except where this is appropriately cited through full and accurate
+referencing.
+3. The thesis does not contain material which has been accepted, or submitted,
+for any other degree or diploma at a university or other institution.
+4. We have acknowledged all main sources of help.
+Student’s Full Name & Signature:
+Afnan Satter
+22201765
+Rabsa Anjum Prosongsha
+24241347
+Mohsina Binte Harun
+24301586
+Masrura Nahian Nodi
+22201421
+Tasnim Nida
+22201954
+i
+Approval
+The thesis/project titled “ A MARL Framework for Adaptive Differential Privacy
+in Byzantine-Resilient Federated Learning” submitted by
+1. Afnan Satter (22201765)
+2. Rabsa Anjum Prosongsha (24241347)
+3. Masrura Nahian Nodi (22201421)
+4. Mohsina Binte Harun (24301586)
+5. Tasnim Nida (22201954)
+of Fall, 2025 has been accepted as satisfactory in partial fulfillment of the require-
+ment for the degree of B.Sc. in Computer Science in Fall 2025.
+Examining Committee:
+Supervisor:
+(Member)
+Dr. Muhammad Iqbal Hossain
+Associate Professor, CSE
+Department of Computer Science and Engineering
+Brac University
+Thesis Coordinator:
+(Member)
+Dr. Md. Golam Rabiul Alam
+Professor
+Department of Computer Science and Engineering
+Brac University
+Head of Department:
+(Chair)
+Dr. Sadia Hamid Kazi
+Chairperson
+Department of Computer Science and Engineering
+Brac University
+ii
+
+Abstract
+While Federated Learning (FL) enables decentralized model training, the presence
+of malicious participants who submit corrupted or poisoned updates poses a severe
+threat to model convergence and integrity. Traditional aggregation methods often
+struggle when applied in decentralized model training with RL tuned Differential
+Privacy (DP) noise, as static noise injection typically degrades model utility or fails
+toaccountforthedynamicnatureofadversarialattacks. Toaddressthis, wepropose
+a novel Multi Agent Reinforcement Learning (MARL) framework for Adaptive Pri-
+vacy Budget allocation in Byzantine resilient FL environments. In this framework,
+multiple RL agents collaborate to dynamically calibrate DP noise levels based on the
+observed variance and reliability of local updates. By learning the optimal balance
+between privacy-preserving noise and model utility, the MARL controller effectively
+masks sensitive data while isolating anomalous Byzantine contributions. Further-
+more, our mechanism utilizes the dynamic noise optimization method (DNO-RL)
+that dynamically adjusts the Gaussian noise scale, ensuring that noise injection is
+minimized during critical convergence phases and intensified when potential poison-
+ing is detected. This adaptive approach enables the system to maintain Byzantine
+resilience without the catastrophic accuracy loss associated with fixed-rate DP. Ex-
+tensive experiments on large-scale datasets demonstrate that our framework achieves
+superior robustness against label-flipping and gradient-manipulation attacks, pro-
+viding a scalable solution for trustworthy, privacy-preserving collaborative learning
+with provable DP guarantees.
+Keywords:Federated Learning, Differential Privacy, Byzantine Resilience, Multi-
+Agent Reinforcement Learning, Adaptive Noise Injection, Dynamic Noise Optimiza-
+tion
+iii
+Dedication
+Thanks to Almighty Allah for giving us the strength and patience to complete this
+thesis. We would like to dedicate this thesis to our beloved Supervisor Dr. Muham-
+mad Iqbal Hossain sir, RA Fahmid UL Alam Juboraj for unwearied support, encour-
+agement, and understanding throughout the academic journey. Their unwavering
+belief in us and our dedication and our believe in us has been a constant source of
+motivation.
+iv
+Table of Contents
+Declaration i
+Approval ii
+Abstract iii
+Dedication iv
+Table of Contents v
+List of Figures vii
+List of Tables viii
+1 Introduction 1
+1.1 Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1
+1.2 Rational of the Study or Motivation . . . . . . . . . . . . . . . . . . . 2
+1.3 Problem Statement . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.4 Objective . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.5 Methodology in Brief . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+1.5.1 Selection and Partition of Datasets . . . . . . . . . . . . . . . 5
+1.5.2 Client Set-up of FL and Privacy Budget Assignment . . . . . 5
+1.5.3 RL Tuned DP in FL . . . . . . . . . . . . . . . . . . . . . . . 6
+1.5.4 Privacy Cost . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.5.5 MARL Training . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+1.5.6 Final Evaluation Phase . . . . . . . . . . . . . . . . . . . . . . 8
+1.6 Scopes and Challenges . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+1.6.1 Scopes . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+1.6.2 Challenges . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+2 Literature Review 10
+2.1 Preliminaries . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+2.2 Review of Existing Research . . . . . . . . . . . . . . . . . . . . . . . 10
+2.3 Summary of Key Findings . . . . . . . . . . . . . . . . . . . . . . . . 16
+3 Proposed Methodology 19
+3.1 Methodology Overview . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+3.1.1 Design Process . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+3.1.2 Design Process Workflow . . . . . . . . . . . . . . . . . . . . . 21
+3.2 Preliminary Design: Multiple Alternative Solutions . . . . . . . . . . 22
+v
+3.2.1 Problem Constraints and Design Requirements . . . . . . . . . 22
+3.2.2 Comparative Justification and Design Selection . . . . . . . . 25
+3.3 Base Model Selection and Justification . . . . . . . . . . . . . . . . . 26
+3.3.1 DetectionBackbone: DamoYOLO(TinyNAS+GiraffeNeckV2
++ ZeroHead) vs. Alternatives . . . . . . . . . . . . . . . . . . 26
+3.3.2 RL Agent: DDPG vs. Alternatives . . . . . . . . . . . . . . . 27
+3.3.3 FL Aggregation Rule: Byzantine-Resilient FedAvg vs. Alter-
+natives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28
+3.4 Dataset Collection and Preparation . . . . . . . . . . . . . . . . . . . 29
+3.4.1 Anti-UAV600 Thermal Dataset . . . . . . . . . . . . . . . . . 29
+3.4.2 Data Preprocessing: Mosaic, MixUp, and Scale-Aware Aug-
+mentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+3.4.3 Data Integration . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.4.4 Data Reduction . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.4.5 Summary of Processed Data . . . . . . . . . . . . . . . . . . . 31
+3.5 Results and Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+4 34
+4.1 Detection Model Architecture . . . . . . . . . . . . . . . . . . . . . . 34
+4.1.1 TinyNAS Backbone (CSP + SPP + Strided Convolution) . . 34
+4.1.2 GiraffeNeckV2: Multi-Scale Feature Fusion . . . . . . . . . . . 34
+4.1.3 ZeroHead: Anchor-Free Detection . . . . . . . . . . . . . . . . 35
+4.1.4 Detection Loss . . . . . . . . . . . . . . . . . . . . . . . . . . 35
+4.2 Federated Learning Client Setup . . . . . . . . . . . . . . . . . . . . . 35
+4.2.1 Client Configuration . . . . . . . . . . . . . . . . . . . . . . . 36
+4.2.2 Privacy Budget Assignment . . . . . . . . . . . . . . . . . . . 36
+4.2.3 IID and Non-IID Partitioning . . . . . . . . . . . . . . . . . . 36
+4.3 DP-SGD with DDPG-Guided Adaptive Noise Selection . . . . . . . . 36
+4.3.1 DP-SGD Mechanism . . . . . . . . . . . . . . . . . . . . . . . 36
+4.3.2 DDPG Agent for Adaptive Noise Selection . . . . . . . . . . . 37
+4.4 Byzantine-Resilient FedAvg Aggregation . . . . . . . . . . . . . . . . 37
+4.4.1 Byzantine Detection . . . . . . . . . . . . . . . . . . . . . . . 37
+4.4.2 Aggregation . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+4.5 SiamFC Tracking . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+4.6 Evaluation strategies . . . . . . . . . . . . . . . . . . . . . . . . . . . 38
+4.6.1 Overview . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+5 Conclusion 40
+5.1 Summary of Findings . . . . . . . . . . . . . . . . . . . . . . . . . . . 40
+5.2 Recommendations for Future Work . . . . . . . . . . . . . . . . . . . 40
+Bibliography 42
+vi
+List of Figures
+1.1 Process Flow Diagram . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+1.2 Data Pipeline in the Environment . . . . . . . . . . . . . . . . . . . . 5
+3.1 The Design Workflow . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+3.2 mAP vs communication round . . . . . . . . . . . . . . . . . . . . . . 24
+3.3 FL with MARL drone detection,mAP per episode . . . . . . . . . . . 24
+3.4 Noise level vs the rounds for differentρ. . . . . . . . . . . . . . . . . 25
+3.5 Confusion Matrix of all methods . . . . . . . . . . . . . . . . . . . . . 32
+3.6 Privacy Utility Tradeoff Trajectory across Communication Rounds . 33
+3.7 Noise level Allocation across Communication Rounds . . . . . . . . . 33
+vii
+List of Tables
+2.1 Summary of Key Findings in Federated Learning Literature . . . . . 17
+3.1 Comparative Evaluation of Alternative Design Solutions . . . . . . . 25
+3.2 Detection Backbone Comparison . . . . . . . . . . . . . . . . . . . . 27
+3.3 RL Agent Algorithm Comparison . . . . . . . . . . . . . . . . . . . . 28
+3.4 FL Aggregation Rule Comparison . . . . . . . . . . . . . . . . . . . . 29
+3.5 Summary of the processed Anti-UAV600 dataset after all preprocess-
+ing, integration, and reduction steps. . . . . . . . . . . . . . . . . . . 31
+3.6 Summary of the processed Anti-UAV600 dataset after all preprocess-
+ing, integration, and reduction steps. . . . . . . . . . . . . . . . . . . 32
+viii
+Chapter 1
+Introduction
+1.1 Background
+In current machine-learning research, the terms privacy, security, and trust are dis-
+tinguished as important preconditions for the increased adoption of information-
+based intelligence. The paradigms of centralised learning require the close exposure
+and the ultimate accessibility of datasets of users, which promotes the problem of
+data exfiltration, compliance with regulations, and exposing the vulnerability of one
+point of system crash to failure.
+Federated learning (FL) is a messaging decentralised alternative that allows optimis-
+ing the models of a distributed population of clients with the use of only in-device
+raw data. This architecture removes most of the privacy sensitivity issues present
+in centralised designs, which makes FL especially appropriate to massively deployed
+applications with privacy challenges. The decentralised nature gives it strength
+against a special group of operating risks.
+However, FL also comes with its own set of challenges, the first of them being
+the unification of the model updates that were generated by heterogeneous and,
+possibly, unreliable participants. Poisoned gradients (an example of the Byzantine
+behaviours) and rebranding, as well as other malicious software updates, undermine
+the convergence path and can adversely affect overall model performance, partic-
+ularly in a situation where traditional aggregation mechanisms are based on the
+assumption of honest behaviour.
+FL deployments are known to often use the mechanisms of differential privacy (DP)
+to further strengthen privacy assurances. The protective effect of a DP scheme is,
+however, subject to its particular implementation properties- the noise level, sensi-
+tivity estimation, and query budget optimality all have a bearing on the protection
+utility balance achieved.
+Also, fixed privacy budgets drive a strict tradeoff between confidentiality and utility,
+neither of which is optimally beneficial in a setting where adversarial forces can rise
+and fall, and clients can be considered reliable or unreliable. The synergising ex-
+istence of non-homogeneous levels of threats and exploitative behaviour, therefore,
+further intensifies the challenges described above during the course of the training
+lifecycle.
+1
+1.2 Rational of the Study or Motivation
+The primary reason for conducting this study is to resolve the increasing conflict
+between maintaining privacy and model strength in collaborative machine learning
+frameworks. Federated Learning (FL) has become a potential alternative to central-
+ized training because it allows a number of clients to collectively learn a global model
+without necessarily sharing their personal data. Nevertheless, FL does not entirely
+eradicate privacy risks. This decentralized environment is not ideal in the real world,
+where clients can be unreliable and untrustworthy, communication channels can be
+compromised, and self-interested participants can deliberately post updated models
+that degrade or corrupt model behavior. In the absence of other privacy protection
+mechanisms, FL is prone to gradient-based privacy attacks that can reveal sensi-
+tive client data. More specifically, federated learning systems that lack Differential
+Privacy (DP) are vulnerable to privacy leakage attacks. The adversaries can use
+reconstruction attacks to reconstruct individual training samples of facial images,
+text fragments, or medical data with high fidelity at a single gradient update of a
+client. Moreover, the membership inference attacks can help to conclude whether a
+particular person’s data was used to train a model, and the property or attribute
+inference attacks can make a conclusion about such sensitive features of a person
+as his/her gender, age, or health condition using updates to the model. These
+breaches of privacy are in direct conflict with the data protection laws and basic
+privacy rights, which are implemented by the current legal standards. To alleviate
+these risks, DP is added to FL to add some noise control to client updates before
+sending them.
+In the majority of federated learning, the central server is expected to be honest but
+inquisitive, that is, they adhere to the protocol in its true sense, but may seek to
+acquire sensitive information about the updates they receive whenever feasible. Dif-
+ferential Privacy guarantees that, although the server may view the model weights
+or gradients, identifiable information is obscured by the injected noise to the extent
+that it is not possible to reconstruct identifiable data. The fact that the aggregate
+of many clients updates reduces information leakage further and that the global
+model gets progressively better with each set of training rounds makes the point
+of aggregating many clients updates in their turn. Consequently, DP is a key pri-
+vacy protection tool in federated learning systems. Nevertheless, inasmuch as DP
+theoretically solves the privacy leakage, it presents a strict privacy-utility tradeoff.
+The vast majority of current methods use deterministic budgets of privacy and con-
+stant noise on all clients and training sessions. This fixed setup frequently results
+in avoidable diminution of accuracy or poor protection in adversarial situations.
+The constraint is especially strong in settings that are prone to Byzantine attacks,
+in which the intensity of attacks, trustworthiness of clients, and the behaviour of
+participation as a phenomenon evolve dynamically. This leads to ineffective and
+even counterproductive privacy enforcement of all clients and training rounds as the
+same, irrespective of any observable behavior or quality of contribution, which is
+effective in many adaptive systems. Equally, federated learning systems need sys-
+tems that can dynamically respond to changes in training rather than using fixed,
+2
+one-size-fits-all policies. This study is inspired by the necessity of smart and context-
+sensitive privacy controls that can ensure the privacy of data, but at the same time
+do not reduce model utility or strength because of the learning-based privacy con-
+trol. This flexibility is necessary to facilitate federated learning to transition from
+controlled laboratory settings to trustworthy deployment in real-world, adversarial,
+and privacy-sensitive environments.
+1.3 Problem Statement
+The field of Federated Learning (FL) has become more and more popular as a
+privacy-friendly version of training a centralized machine learning model, allowing
+collaborative model training without sharing data directly. However, the benefits
+associated with it, FL systems need to run in highly decentralized and distrusted
+conflicting settings where participating clients can act unstable and malicious man-
+ner. These environments expose the global learning process to Byzantine failures,
+such as poisoned gradients, manipulated labels, and corrupted updates, which can
+greatly worsen model convergence and corruption. Other mechanisms that may
+be applied to protect sensitive information are Differential Privacy (DP), which is
+usually introduced to FL because of noise injection. Even though formal privacy is
+guaranteed by DP, in practice, there is a serious trade-off between privacy and model
+utility in its implementation. The majority of the current FL models assume the use
+of fixed privacy budgets and fixed noise levels, and use the same level of perturbation
+on each training round and each client. This hardening method does not take into
+consideration the dynamism of federated settings, where the reliability of clients,
+distributions of data, and adversarial behavior change as time goes by. This is more
+amplified in the Byzantine conducive regions. One way that static DP noise can lead
+to unnecessary learning either in static convergence phases or is inadequate when
+adversarial activity is increasing, is by itself. Additionally, conventional approaches
+to aggregation, like FedAvg, are commonly simple enough not to respect or notice
+aberrant updates, particularly when the DP noises replace the difference between
+harmless or criminal actions. Consequently, privacy measures and resiliency plans
+often conflict, as opposed to coordinating. Though there are separate constituents
+of privacy preservation, Byzantine resilience, and adaptive optimization, they are
+largely discussed on a case-by-case basis. The existing studies are silent on the need
+to have a unifying, dynamic structure capable of cleverly managing the enforcement
+of privacy and, at the same time, remaining resistant to the forces of the adversar-
+ial clients during the training exercise. This lack of adaptive control renders this
+method infeasible in a real-world, adversarial, and privacy-sensitive context, and
+the lack of such ability poses a serious gap that needs to be closed to ensure that
+federated learning can be both trusted and useful at scale.
+1.4 Objective
+The given framework simplifies the formulated federated learning with differential
+privacy to a Multi-Agent Reinforcement Learning (MARL) problem, whereby single
+clients would act as independent agents that learn optimal privacy budget allo-
+3
+cations to global performance restraints individually. This design is backed by a
+dynamic noise calibration adaptive mechanism, with which the clients can adjust
+the amount of noise propagated in the different training rounds without violat-
+ing cumulative privacy budget constraints. In order to maintain the integrity of
+operations in adversarial settings, the system incorporates the Byzantine-resilient
+aggregation methods that can minimize the effect of malicious or abnormal up-
+dates, like the ones that are generated during the label-flipping and the gradient-
+manipulation attacks. A complex reward system directs the learning paths of the
+agents in order to match the global model utility with collaborative behaviours
+that are privacy-constrained. A more detailed assessment in real adversarial con-
+ditions on benchmark datasets allows comprehensively investigating the underlying
+privacy-strength-privacy-robustness and model-accuracy trade-offs and proves the
+greater effectiveness of this adaptive privacy control system than the more classical
+static differential privacy settings.
+1.5 Methodology in Brief
+We are and will be using the MARL framework in this study; each client of the
+federated learning is characterized as a separate reinforcement-learning agent which
+learns how to spend its privacy budget, yet all agents coordinate their own actions
+to the global model.
+As a preliminary remark to the detailed description of the workflow, we would like
+to say that we suppose that the server, on which all the aggregations will occur, is an
+honest yet inquisitive server. And we also viewed our pipelines as being vulnerable
+where Local Client agents and server are connected, and hence we assumed that an
+outlier/attacker may seek to make untargeted attacks to compromise the quality of
+thecentralmodelswiththehelpofsomenetworkattacktoolssuchaspacketinjectors
+to further increase the DP noise, sign flipping, random noise, etc. And the most
+typical FedAvg is so naive as to pick up or cancelize these disloyal updates, as it is,
+though, a mere simple average of all the weights and then aggregates. Accordingly,
+werequireda Byzantine faultclientupdate handlertoblock thesemaliciousupdates.
+Figure 1.1: Process Flow Diagram
+4
+1.5.1 Selection and Partition of Datasets
+Tobeginwith, werequiredsomebenchmarkingdatasetsthatareidealtoplayaround
+with in the experimental setting and then apply it to the real world. Therefore, we
+selected MNIST (handwritten grayscale28×28digit images made of 10 classes),
+and CIFAR-10 (small natural32×32×3RGB images of 10 classes). Where we
+attempted to tie the IID and Non-IID dataset in which we maintain the balance
+of the group of clients together so that we can eliminate some forms of bias in our
+model towards a specific group.
+1.5.2 Client Set-up of FL and Privacy Budget Assignment
+We initially had ten clients (K= 10) to take part in the FL. And we needed to
+assign a total Privacy budget (ρk) per client based on our business requirement, i.e.,
+we were making the assumption that the dataset of some clients is more privileged
+than that of other clients at random, hence has to get assigned more privacy. In the
+case of MNIST,ρk is uniformly sampled between[2,4]and in the case of CIFAR-10,
+we uniformly sampled between[20,40]. Since this dataset is full of colourful images
+and details, the model will barely be able to learn the right pattern with much noise
+on it. The clients (k) will each possess a partitioned personal datasetDk.
+Figure 1.2: Data Pipeline in the Environment
+5
+1.5.3 RL Tuned DP in FL
+In this way, we are establishing the environment our MARL agents will engage to
+spend that privacy budget each of them was assigned thoughtfully.
+Initialization
+•The initial Global Model parametersθ 0 will be first generated at the Central
+Server.
+•Hyperparameters likeC(clipping bound),E(local epochs),T(total commu-
+nication rounds), andη(learning rate), noise level bounds[σmin,σ max], so that
+each agent can explore and exploit the policy network in a meaningful manner.
+The noise level is bounded inside[σmin,σ max], so it does not increase so much
+while they are learning in the early stages.
+Per-round DP-FL Process (Algorithm 1)
+The central server broadcasts the current global modelθt (trainable parameters, i.e.,
+weights, bias values) to all of those 10 clients.
+According to (Chen et al., 2024),[17] each clientk:
+θt
+k←θ t (1.1)
+For local epochse= 1toE:
+•Each client will shuffle/split their local and privateDk into mini-batches of
+size≤200.
+For each mini-batchB:
+∇L(x,y;θ t
+k)(1.2)
+Clip:
+∇L←∇L×min
+(
+1, C
+∥∇L∥2
+)
+(1.3)
+Compute the mean clipped gradient.
+Add Gaussian noise:
+N
+(
+0,(σt
+k)2×C 2×I
+)
+(1.4)
+Update:
+θt
+k←θ t
+k−η×noisy_mean_gradient (1.5)
+Clients uploadθt
+k.
+Server aggregates (FedAvg, data-weighted):
+θt+1 =
+∑|Dk|×θ t
+k∑|Dk| (1.6)
+6
+This is only applicable where we are not considering any byzantine failure. If a
+client or an update from a client were to be compromised, then this formula would
+be modified into:
+Let Accepted_Set={k:clientkpassed authentication}
+θt+1
+G =
+∑
+k∈Accepted_Set|Dk|×θ t
+k∑
+k∈Accepted_Set|Dk| (1.7)
+(Zafar et al., 2025).[14]
+Compute reward:
+rt =Acc(θ t+1)−Acc(θ t)(1.8)
+1.5.4 Privacy Cost
+ρt
+k = 2E
+(σt
+k)2 (1.9)
+(fromρ-zCDP)
+Constraint per client:
+T−1∑
+t=0
+ρt
+k≤ρ k (1.10)
+1.5.5 MARL Training
+Dec-POMDP Formulation:
+st
+k = (t,ρk)(1.11)
+at
+k =σ t
+k∈[1,20](1.12)
+rt =global test accuracy improvement (1.13)
+Discount factorγ.
+We used DDPG (Deep Deterministic Policy Gradient).
+Networks: We used parameter sharing for reduced computational overhead. One
+shared actorπ(s)and one shared criticQ(s,a)for all 10 clients.
+Actor output passed through sigmoid, first we get[0,1]then scaled to[1,20].
+Three fully connected layers each.
+Per Episode
+Fort= 0toT−1:
+•Actor outputs raw actiona t
+k + exploration noise (Gaussian).
+•Action Mapping Module (key innovation):
+7
+Compute implied raw:
+ρt
+k = 2E
+(at
+k)2 (1.14)
+Solve convex quadratic program (Eq. 6) per client:
+min
+αk,bk
+∑
+(ρt
+k−αkρ′t
+k−bk)2 (1.15)
+subject to:
+∑
+(αkρ′t
+k +bk) =ρ k (1.16)
+2E
+σ2
+max
+≤α kρ′t
+k +bk≤ 2E
+σ2
+min
+,∀t(1.17)
+Apply affine mapping→final¯σt
+k.
+Store transitions(st
+k,¯σt
+k,rt,st+1
+k )in replay buffer.
+With Value Decomposition Network (VDN): minimize TD error on summed per-
+agent Q-values.
+1.5.6 Final Evaluation Phase
+We will get the trained actor policyπ(no more exploration, no noise).
+Run one final standalone DP-FL training (Algorithm 1) forTrounds.
+After roundT, we will be obtaining final global modelθT.
+Lastly, we will have to compute the final test accuracy Acc(θT )on the 10k held-out
+test set.
+1.6 Scopes and Challenges
+1.6.1 Scopes
+i)Dynamic Participation of clients:This framework would benefit from a
+dynamic per-client privacy budget allocation. If a new client joins the existing
+client set, the assigned privacy budget should include a reference marker or
+comparison vector that indicates how privileged the new client’s budget allo-
+cation would be (tight or expanded) in terms of datasets if considered more
+crucial than other clients. Such a mechanism would also allow proportional
+adjustment of privacy budgets across clients, enabling controlled increases or
+decreases while maintaining fairness within the system. However, introducing
+these simultaneous adjustments of privacy budget can make the DDPG algo-
+rithm perform unstably or it might result in a suboptimal budget allocation.
+ii)Scalability in terms of clients:Currently, the framework has been tested
+with 10 selected clients, and with a balance of IID and Non-IID data. We
+need the assistance of an algorithm that can handle other incoming Non-IID
+clients and also be able to aggregate the weights carefully if some of the clients
+leave mid-way. It will focus on heterogeneous networks like different end node
+specifications, such as different CPU power, different RAM, VRAM capacities,
+etc.
+8
+iii)Alternative DP Method:The amount of complexity we are dealing with
+currently is sufficient for theρ-zCDP algorithm. Future and complex works
+might include the other Rényi-DP or Laplacian noise and adaptive(ε,δ)in
+DP, and measure the privacy-utility trade-offs.
+iv)Scalability:We need to put it in a large, scalable Federated Learning network
+with real and spacious datasets, and we might have to run it and observe how
+many steps the MARL agents learn their optimal policy.
+1.6.2 Challenges
+i)Accuracy:currently this framework is 1% better on MNIST and 0.2% better
+on CIFAR-10 it may or may not be generalized with other tasks with other
+kind of datasets involved, if we used datasets like images or videos like the one
+in anti-uav dataset it would probably increase too, so the outcomes are unseen
+and can vary in terms of datasets used.
+ii)RL Overheads:We must reduce the CPU usages and RAM allocations so
+that it can be implemented with a lighter model and unveil the dimensions for
+use in IoT systems.
+iii)Security:We have to protect our RL er Q-network & experience replay buffer
+at any cost. If it gets hacked, our dp noise will be used against us to poison
+our global model.[11](Hossain et al., 2025)
+iv)Credit Assignments:We also tried to add a mechanism called “Participa-
+tion Watermarking” so that after the training session, the credit goes to the
+original owner, which means that by analyzing those watermarking signatures,
+one can tell which clients actively participated in the FL. But the watermark-
+ing method comes with a coupling problem with DP noise, same as seen in the
+privacy vs utility preserving context, because it holds a mathematically inverse
+relation with DP noise, which meaans it will be hard to preserve sometimes.
+v)Computation Efficient Reward function:A better reward function may
+reach the optimal solution much faster; the current reward function is slow
+and unstable to converge. And we also need to keep in mind that the Ac-
+curacy loss between each round should be minimised in such a way that the
+cumulative minimizations over training round T would give the best Global
+model accuracy while maintaining the privacy and the privacy budget fully
+utilized
+9
+Chapter 2
+Literature Review
+2.1 Preliminaries
+The preliminaries of this study incorporated decentralized maximization, formal
+privacy guarantees, and adversarial robustness. Federated Learning (FL) can allow
+more than one client to jointly train a global model by using such algorithms as
+FedAvg, which can aggregate local model updates depending on the size of the
+dataset, but which still provides data locality. Nevertheless, they are still susceptible
+to attacks brought about by reconstruction, thus requiring the use of Differential
+Privacy (DP). DP represents a strictly mathematical design that averts personalized
+participation by incorporating injected Gaussian noise to gradients, hence creating
+a demonstration of privacy utility trade-off.
+Decentralized networks, despite such protections, can be Byzantine resistant to
+Byzantine malicious agents who provide poisoned updates to divert model con-
+vergence. To be Byzantine resilient, there must be strong aggregation methods
+aimed at isolating the anomalous contribution and ensuring that the model is sta-
+ble. Multi-Agent Reinforcement Learning (MARL) is used as a dynamic control
+layer to control these opposing requirements.
+Here, customers are viewed as independent agents that monitor the conditions of the
+environment, including privacy budget usage and training process, in order to imple-
+ment the best noise-injection strategies. With global accuracy, maximizing a shared
+objective enables MARL to transform the fixed configurations to an intelligent, sit-
+uational defense system to uphold data confidentiality and with the robustness of
+the models in adversarial environments.
+2.2 Review of Existing Research
+Wang et al. (2023) [6] present the Dynamic Noise Optimization through Reinforce-
+ment Learning (DNO-RL) architecture, which solves the performance loss of the
+static differential privacy by applying an agent of a deep reinforcement learning
+to perform the training steps dynamically by adjusting noise scales. Its algorithm
+is based on an RL agent monitoring training dynamics in real-time, e.g. gradient
+norms and loss variations, to dynamically control the noise level used by the Gaus-
+sian noise gradient, such that privacy security is maximized yet without introducing
+10
+too much interference with model convergence. This model is a great improvement
+onheuristicorfixed-ratenoiseschedulesinthatitshowsthatanintelligentcontroller
+can learn to add noise more smartly (e.g., adding less noise at critical convergence
+points and more at times in the training path when it becomes unstable). Although
+DNO-RL has a strong utility-privacy trade-off in benign settings, the existing for-
+mulation only considers benign settings and lacks specific support of the adversarial
+Byzantine environment and decentralized multi-agent coordination of the large-scale
+federated learning. That is why the current work will offer the underlying rationale
+of your suggested framework, which will extend the DNO-RL mechanism to the
+Byzantine-resilient MARL environment to safeguard against active model poisoning
+and gradient manipulation. The authors suggest that the future development of
+this study ought to focus on how this dynamic calibration technique can be imple-
+mented into more sophisticated and distributed architectures and study its resilience
+to targeted adversarial attacks.
+To find the application of Multi-Agent Reinforcement Learning (MARL) to opti-
+mize differential privacy budget allocation in federated learning, a research paper
+by Chen et al. [16] proposes an adaptive privacy budget allocation framework for
+Federated Learning (FL). This helps MARL to manage the tradeoff between model
+utility and Differential Privacy. This whole process works as every client operates
+using the Deep Deterministic Policy Gradient (DDPG) and acts alone as an agent,
+which is autonomous. They use the algorithm DDPG to determine the Gaussian
+noise level k1, where k1 is necessarily defined from each communication round from
+local model performance metrics. To address the computational complexity along
+with the credit assignment issue that they get in large-scale FL, they use a Value
+Decomposition Network (VDN). The methodology they use, which utilizes param-
+eter sharing across agents and a mapping module for specialized action, creates a
+strict adherence to a total privacy budget by using
+∑T−1
+t=0 ρt
+k ≤ρ k through affine
+transformations. This paper uses the MNIST and CIFAR-10 datasets, which is
+why it significantly outperforms any allocation methods, as they put higher noise
+during the initial phase. Yet, this framework might have some limitations, such
+as an absence of mechanisms to determine any malicious agents, and it keeps the
+system vulnerable to gradient manipulation. The Byzantine-resilient framework can
+actually mitigate this by evolving MARL-based noise control into a Dynamic Noise
+Optimization(DNO-RL) mechanism.
+Zhuo et al. [1] introduced the framework of Federated Deep Reinforcement Learn-
+ing (FedRL) to simplify the process of building quality policies without breaching
+the privacy of data and models. This approach means agents do not have to share
+raw observations or rewards, but only the encoded results of their local Q-networks
+based on them. To avoid the accidental, unintentional infusion of individual mod-
+els, Gaussian differential privacy will be applied by including noise understood to
+be calibrated to the results that are being transmitted. These perturbed values are
+then propagated to a shared multilayer perceptron (MLP) to generate a global Q
+-network value that is used to update collaborative models. Such a decentralized
+structure provides agents the advantage of shared information without revealing lo-
+cal data. The assessment was done on both Grid-World and Text2Action domains
+using a set of specific benchmarks and metrics. The experiments of grid-world were
+conducted on eight thousand procedurally generated maps of sizes 8×8, 16×16, and
+11
+32×32 to determine Success rate (SuccRate) and Average Reward (AvgRwd). The
+Microsoft Windows Help and Support (WHS), WikiHow Home and Garden (WHG),
+and CookingTutorial (CT) datasets were used in the domain of Text2Action. The
+F1 score and the cumulative rewards average were used to measure task perfor-
+mance. Baseline comparisons to both the DQN-alpha and DQN-full demonstrated
+that the FedRL framework can obtain policy quality that is similar to non-privacy-
+conserving centralized models. The outcome shows that agents who were members
+of the federation performed better than the wastelands, thus showing that collective
+learning improves the accuracy of local policies. Besides, incorporating privacy-
+saving noise does not significantly negatively affect the learning efficiency and the
+achievement of near-optimal success rates. Another weakness, however, is that the
+use of transition “IDs” between agents is mandatory to match relevant data points
+across local datasets. Also, the existing implementation has been experimented with
+two-member federations only. The research to be done in the future should thus ex-
+plore how larger populations could be integrated and how incomplete action modes
+can be used as domain knowledge.
+Zhou et al.[20] introduced the Concurrent Federated Reinforcement Learning with
+Local Differentiating Privacy (LDP -CFRL) structure in which the optimal resource
+allocation in edge-based Internet of Things (IoT) systems are targeted, and the
+chance of information leakage to untrusted servers is reduced. To address the sus-
+ceptibility of local models to inversion and reconstruction attacks, this method adds
+a Gaussian noise at the gradients of the edge hosts directly into the training. Before
+noise injection, there is a gradient clipping done to limit sensitivity hence guaran-
+teeing that the local training process adheres to the theoretical guarantees of the
+approximate local differential privacy. The framework allows joint decision-making
+in real-time between the agents and the server using the transmission of noisy out-
+puts and rewards only, which is effective in preventing the inference of raw data
+and model parameters. The performance of the system in three IoT scenarios was
+examined through a Python-based simulator where the task generation applied a
+Poisson distribution; effectiveness is measured through measures of average utility,
+average time step of the completion process, and average resource utilization. Em-
+pirical findings demonstrate that LDP-CFRL reaches high task completion speeds
+and utility than traditional deep reinforcement learning baselines and that the noise
+injected is effective at reducing overfitting, and in certain instances, the rate of re-
+source utilization is improved over their non-private counterparts. However, severe
+limitations, such as a relatively small decrease in total utility compared to models
+that are non-private and have concurrent federation, remain. The first constraint
+is connected to scalability, where accelerated system noise also grows along with
+the host number of edge causing a gradual utility reduction. Furthermore, despite
+the evident improvement of the average reward with training, convergence of the
+Q -loss is theoretically unguaranteed due to the application of nonlinear function
+approximators in the deep Q -network structure. These scalability issues and the
+underlying trade-offs between privacy budget and system performance should be
+mitigated in future work.
+Hafeez et al.[18] develop a framework for robotic-assisted surgery that integrates
+differential privacy (DP) with homomorphic encryption (HE) to facilitate collabo-
+rative model training while safeguarding sensitive patient data. This framework is
+12
+a Federated Deep Reinforcement Learning (FDRL), and the methodologies utilize
+DP-SGD to add Gaussian noise to local gradients. They also implement secure ag-
+gregation using FdAvg on encrypted updates, which is why the reduction of privacy
+leakage happens effectively rather than happening in centralized baselines. This
+architecture provides a multi-layered privacy approach, where they fix privacy pa-
+rameters and assume they are in a cooperative environment. Hence, it leaves the
+model vulnerable to model poisoning and gradient manipulation attacks. Further-
+more, the requirement for centralized policy storage for their meta-learning-based
+selection mechanism which deviates from strict federated learning principles, is a
+limitation. Future research needs to focus on optimizing the computational effi-
+ciency of the encryption processes. Also need expansion in validating framework as
+per as the real-world clinical environments prefer, as this will necessarily ensure the
+safety and scalability of decentralized surgical intelligence. Yet the implementation
+of true federated learning with FedAvg with DP and HE and multi-layered privacy,
+handling Non-IID Data with >92% accuracy under high heterogeneity as they do
+dynamic policy selection with comprehensive evaluation, is a good performance of
+this research.
+The research by (Fang et al. n.d.)[7] proposes a Byzantine robust Federated learning
+(DFL) algorithm, which was actually designed for a peer-to-peer communication
+graph G = (V, E). This whole process does not require a central server and centers
+on a robust local aggregating filter. Hereby, each client uses its own local model as a
+dynamic reference, and that validates the neighbours through an adaptive similarity.
+Therefore, with the help of mathematical and experimental assertion this mechanism
+allows the filter to be increasingly stringent as training processes. They effectively
+neutralize white box poisoning attacks, including label flipping, even when malicious
+clientscompriseupto80%ofthenetwork. Thisresearchworksheavilyonguarantees
+that match Byzantine-free optimization rates, but the validity actually depends on
+theunrealisticassumptionofbenignsubgraphconnectivityandlacksexplicitprivacy
+protections against model leakage during neighbor exchange.
+The research for (Li et al. n.d.) [9] provides a systematic empirical evaluation
+of aggregation schemes which is in centralized federated learning. The methodol-
+ogy introduces a method before performing cosine similarity-based clustering; they
+adaptively clip update norms. They set the clipping thresholdτto the median of his-
+torical update norms; therefore, the algorithm effectively mitigates large-magnitude
+perturbations such as Inner Product Manipulation (IPM) and Sign Flipping. The
+best part is that this whole approach is in no need of requiring manual hyper-
+parameter tuning. Although the approach demonstrates superior performance in
+IID settings with no vulnerability against diverse untargeted attacks, the research
+defined a catastrophic performance drop for all robust aggregators under extreme
+Non-IID data distributions. Furthermore, the method lacks formal theoretical con-
+vergence proofs and relies on the assumption of full client participation to maintain
+a majority of benign updates in every communication round.
+The (Zafar et al. n.d.)[14] study gives a systematic empirical analysis of aggrega-
+tion schemes in centralized federated learning and presents a new approach that
+clips update norms adaptively and followed by cosine similarity-based clustering.
+The algorithm effectively reduces large magnitude perturbations, including Inner
+13
+Product Manipulation (IPM), and Sign Flipping without manual hyperparameter
+adjustment by setting the clipping threshold t to the median of historical norms in
+updates. Even though the unanimity of the approach shows improved performance
+in IID environments and immunity to a variety of untargeted attacks, the authors
+point out that all robust aggregators experience a disastrous performance reduction
+under extreme Non-IID data distributions. Additionally, the technique does not
+contain formal theory convergence demonstrations and is based on the possibility
+of complete client participation to ensure the majority of benign updates in each
+communication round.
+The (Zafar et al. n.d.)[14] defense framework will deal with the problem of authenti-
+catingupdatesinfederatedlearningbytrainingaconditionalGenerativeAdversarial
+Network on the server that generates fake validation data. The system leverages the
+existing global model as a discriminator to produce client-conditioned samples to
+subsequently train a generator that makes conditioned samples, and this sample is
+used to evaluate and filter client updates using adaptive thresholds/K-means clus-
+tering. This method is particularly privacy-saving because it does not require any
+external root datasets and is still effective under non-IID conditions with very high
+true positive rates of attack detection of Random Noise and Label Flipping attacks.
+Nonetheless, the framework is susceptible to advanced backdoor attacks, especially
+when the malicious participation is above 30 per cent, and it also creates a large
+computational load because it necessitates server-side GAN training.
+The study described in (Szelaga et al., n.d.)[13] considers health apps, including
+diabetes prediction, to examine how Reconnecting Malicious Clients (RMCs) who
+alternate between attack strategies, including shifting to Gaussian noise to ALIE,
+can be affected by re-entry into the system. The study uses genuine BRFSS sur-
+vey data for traditional defenses such as Trimmed Mean and Krum to prove the
+statistical significance of performance degradation with RMC using paired t-tests.
+Although the paper reveals a critical gap in the adaptive adversaries, it is based
+on a basic feedforward artificial neural network and the use of homogeneous IID
+data partitions, which restricts the extrapolability of the obtained results to more
+complex and diverse IoT systems. Also, it is limited to three attacks of poisoning,
+which do not take into account contemporary sneaky or backdoor attacks.
+The paper on (Zeng et al. n.d.)[15] specifically addresses unreliable network condi-
+tions with high rates of packet loss and client failures in IoT and edge computing.
+The approaches compare different algorithms, such as RFA and the suggested Fe-
+dRoLA, in terms of energy usage, communication expenses, and convergence speed
+to Byzantine perturbation. Experimental evidence shows that FedRoLA is more ac-
+curate and Byzantine resilient due to aggregation by layers to separate corruption,
+whereas g-Divergence is a better resource-consumption trade-off on energy-limited
+devices. There is still a major weakness in using simulated environments and com-
+mon image datasets, such as MNIST and CIFAR-10, with the performance and
+energy figures not validated on real-world mobile hardware.
+The (Song et al., n.d.) [10] framework presents a multi-module protection of IoT
+settings, which makes use of Information Stored in Weights (IIW) to approximate
+the generalization capacity of local models and UMAP to nonlinear dimensionality
+14
+reduction. To maintain the rich nonlinear geometry of the high-dimensional updates
+and reduce them into low-dimensional updates, the system uses robust regression
+andK-means-basedclusteringtoclassifymaliciousandbenignupdates. Guard-FLis
+effective at dealing with non-IID divergence and at being trained on non-IID models
+because it averages divergent models with weights achieved through IIW, and can
+achieveatruepositivedetectionrateof100%onbothLIEandSign-Flippingattacks.
+Although these strengths are present, both the nonlinear graph construction and
+optimization methods of UMAP have significant overhead in computations on the
+server side and need hyperparameters to be carefully tuned, including all neighbors
+and embedding dimensions.
+To overcome the problem of Byzantine poisoning, the (Chen et al., n.d.)[5] mech-
+anism uses a three-step workflow, which includes magnitude-based detection using
+Isolation Forest and sign-based clustering using Improved DBSCAN. A credibility
+matrix is used to record the historical reliability of each client with the use of a
+sigmoid-based score to eliminate the bottom half of performers in the final aggre-
+gation process. This two-step filtering enables the framework to be very robust
+to stealthy attacks such as Min-Max and Fang, as well as accuracy levels near to
+standard FedAvg in healthy environments. Its lack of explicit dimensionality re-
+duction, however, can make it ineffective at detecting small anomalies in extremely
+large models, and its complexity ofO(n2)at the IDBSCAN stage of clustering is a
+possible bottleneck of scale.
+The(Chenetal., n.d.)[5]papersuggestsMaximumCorrentropyAggregation(MCA),
+which is a technique that aims to achieve a strong global center by maximizing sim-
+ilarities of Gaussian kernels without prior information about the ratio of malicious
+clients. This aggregation solver is based on the fixed-point iteration solver that does
+not suffer from the instability that gradient-based tuning frequently exhibits, and
+with Byzantine influence, it guarantees formal error bounds. Although MCA can
+be very efficient, especially in non-IID environments, against both inlier and outlier
+attacks, it incurs significant server-side calculations because of its iterative similarity
+computations, and it is sensitive to the heuristic choice of kernel widths. Moreover,
+it does not focus on the risk of targeted backdoor poisoning and is only evaluated
+on perturbations on gradient space.
+The framework is the one (Zhao et al., n.d.)[3] which offers a hardware-assisted
+implementation, using Intel SGX Trusted Execution Environments to conduct se-
+cure aggregation as well as Byzantine-robust detection within the boundaries of an
+enclave. Within the enclave, model updates are decrypted, and sample-based de-
+tection (i.e., clients are ranked by Euclidean distances with nearest neighbors) is
+performed, followed by a coordinate-wise median. The design has a high speedup
+of 4-6 times over conventional cryptographic techniques such as Homomorphic En-
+cryption, and is highly accurate against colluding value-replacement attacks. The
+main disadvantages are that the model is hard-dependent on Intel SGX and has a
+128MB memory capacity of the Enclave Page Cache, which limits the size of the
+model and the number of clients that can be served per round without high paging
+overhead.
+The (Lu et al., n.d.) [19]is a lightweight four-step defense based on Pre-aggregation,
+15
+Detection, Removal, and Re-aggregation that is specially tailored to protect the ex-
+isting robustrules, such asKrum andTrimmed-mean. It identifiesmalicious updates
+by computing the Pearson correlation of the local models with a pre-aggregated and
+globally available model or by examining the number of times the parameters were
+dropped during the trimming procedure. Although PDRR is remarkably fast and
+does not need an additional validation dataset, its capability is mostly limited to
+the poisoning attack by Fang and not to evaluating a wider scope of damage, includ-
+ing LIE or backdoor attacks. Moreover, the system makes the assumption that the
+server is given complete trust in the raw model updates, and manual adjustment of
+the threshold parameter q is needed to keep the detection accuracy.
+2.3 Summary of Key Findings
+In their works FLRAM (Zafar et al., 2025)[14], the authors have proposed a two-tier
+system of detection, a combination of magnitude and sign acquisition with creden-
+tials tracing attempts to reject Min-Max and LIE attacks. Although the framework
+can ensure the performance under heterogeneous non-IID data, it does not explic-
+itly reduce the dimensionality of the high-dimensional gradients and cannot achieve
+O(n2)computation cost because it uses IDBSCAN.
+In the same manner, the adaptive privacy budget allocation study (Chen et al.,
+2024)[16]suggestedanMARLapproachofnoisecalibrationtomaximizetheprivacy-
+accuracy trade-off with zCDP mapping and publication of parameters. The system,
+however, is not fully geared towards the honest-but-curious servers and does not
+offer any protection against malicious clients or formal privacy assurance other than
+the empirical budget utilisation.
+Relating to the decentralized settings, BALANCE (Ye et al., 2023)[8] created a peer-
+to-peer similarity filter, which does not require a central server or any idea regarding
+the malicious client ratios. Despite the rigorous convergence proofs of the model in
+the case of white-box resilience, the model assumes benign subgraph connectivity
+and is characterized by performance degradation in case the conditions are extreme
+non-IID.
+Equipped with DP, homomorphic encryption, and meta-learning, the FDRL surgical
+framework (Hafeez et al., 2023)[18] made it possible to use collaborative learning
+to train surgical practice in a specialized domain. Although the performance on
+robotic tasks is high, the need to have a central policy storage extinction policies
+a strict submission to the requirements of federated learning and introduces high
+computational delays in the form of encryption overhead.
+In order to deal with validation in the absence of raw data, the cGAN-based defense
+(Zhangetal., 2023)[14]implementedgenerativemodelsinordertocalculateupdates;
+however, this method is still subject to advanced backdoor attacks and has high-
+latency training on the server-side. Moreover, in Survey Paper-01 (2024) scientists
+investigated Reconnecting Malicious Clients (RMC) in health care facilities, which
+proved through statistical validation how the adaptive adversaries avoid traditional
+defenses, but the small size of their research was dictated by the use of homogenized
+IID data partitions.
+16
+On lightweight detection, PDRR (Liu et al., 2022)[19] made use of pre-aggregation
+correlation in order to single out malicious updates in the absence of auxiliary
+datasets. Although PDRR is computationally efficient, it does not have inbuilt
+privacy controls and limits itself mainly to the poisoning attack of Fang.
+When dealing with heterogeneous agents, FDRL (Zhuo et al., 2020)[1] recommended
+a shared MLP fusion and Gaussian DP, which can deal with asymmetric rewards,
+although the immediate sharing of the Q-values leads to serious leakage of policy-
+level information.
+The same weakness is reflected in CFRL (Zhou et al., 2021)[20], which gives powerful
+LDP demonstrations on the management of IoT resources but does not support
+a standard federated model aggregation, instead using possibly insecure Q-value
+coordination.
+Lastly, it was shown that the utility-privacy trade-off of RL-driven noise is highly
+enhanced by a noise calibration scheme instead of static schedules, although still, it
+is insensitive to Byzantine adversarial behavior (DNO-RL, Wang et al., 2023)[6].
+In hardware-limited environments, SEAR (Deng et al., 2021)[3] was applied to give
+a 6x speedup over cryptography tools by relying on TEE-based filtering, but is still
+limited by the Intel SGX memory limitation.
+To augment such efforts, the MCA approach (Chen et al., 2022)[16] has offered
+fixed-point iteration as similarity aggregation of kernels, which offers rigorous error
+bounds against inlier attacks, but has a high escalation of the computational cost
+of the iteration and is hyperparameteric with respect to kernel width.
+Table 2.1: Summary of Key Findings in Federated Learning Literature
+Paper
+Name
+Strengths Weaknesses & Limitations
+(Chen et al.,
+n.d.)[16]
+Dual-stage detection, magnitude-
+sign anomalies, credibility track-
+ing, Min-Max/LIE resilience,
+non-IID adaptability
+High dimensionality challenges,
+slow credibility adaptation,
+50% selection heuristic, limited
+model scaling
+(Chen et al.,
+n.d.)[17]
+MARL noise calibration, privacy-
+accuracy optimization, parame-
+ter sharing scalability, full budget
+utilization, zCDP mapping
+Honest-but-curious focus, cen-
+tralized reward coordination,
+limited architectural hetero-
+geneity, communication over-
+head, no malicious defense
+(Fang et al.,
+2024)[8]
+Decentralized P2P graph, rigor-
+ous convergence proofs, adaptive
+similarity filter, zero communi-
+cation overhead, white-box re-
+silience
+Benign subgraph connectivity
+assumption, hyperparameter
+sensitivity, potential drift
+attack vulnerability, non-IID
+performance drops, lacks
+DP/HE
+17
+Paper
+Name
+Strengths Weaknesses & Limitations
+(Hafeez et
+al., n.d.)[18]
+Multi-layer privacy (DP+HE),
+secure aggregation, surgical
+meta-learning, high non-IID
+accuracy, comprehensive medical
+metrics
+Policy storage violates FL prin-
+ciples, fixed manual budgets,
+synthetic data limitations,
+HE computational latency, no
+Byzantine defense
+(Li et al.,
+2024)[9]
+Empirical benchmarking,
+adaptive median clipping,
+hyperparameter-free, cosine
+similarity clustering, IPM/Sign-
+flipping mitigation
+No theoretical convergence,
+lacks backdoor/privacy testing,
+assumes full client participa-
+tion, batch size sensitivity,
+restricted dataset variety
+(Zafaretal.,
+2025)[14]
+Synthetic data validation, no root
+dataset required, non-targeted
+attack detection, privacy-
+preserving filtering, non-IID
+robustness
+Backdoor attack vulnerability,
+server-side GAN training la-
+tency, initial model depen-
+dency, limited real-world scal-
+ability
+(Lu et al.,
+n.d.)[19]
+Lightweight detector, no auxil-
+iary data, pre-aggregation corre-
+lation, low computational over-
+head, plugin compatibility
+Narrow poisoning focus, lacks
+privacy mechanisms, manual
+threshold tuning, limited to
+Fang’s attack, no backdoor re-
+silience
+(Zhuo et al.,
+2020)[1]
+Asymmetric reward handling,
+heterogeneous feature spaces,
+shared MLP fusion, Gaussian
+DP guarantees, experimental
+validation
+Q-value leakage, ID-based
+alignment privacy risks, single
+point of failure (Agentα), no
+Byzantine robustness, fixed
+noise levels
+(Zhuo et al.,
+n.d.)[20]
+Local DP guarantees, no gradient
+sharing, concurrent resource opti-
+mization, practical IoT modeling,
+theoretical privacy proofs
+No federated aggregation, pol-
+icy leakage via Q-values, fixed
+homogeneous setting, central-
+ized coordination, lack of DQN
+convergence proof
+(Wang et
+al., 2023)[6]
+Dynamic RL noise optimization,
+real-time training feedback, im-
+proved privacy-utility trade-off,
+adaptive convergence logic
+Benign environment focus, no
+Byzantine resilience, central-
+ized training requirements, un-
+validated against targeted ad-
+versarial attacks
+(Zhao et al.,
+2021)[3]
+Intel SGX hardware accelera-
+tion, high-speed secure aggrega-
+tion, enclave-based Byzantine fil-
+tering, 6x speedup over HE
+Strict hardware depen-
+dency, enclave memory limits
+(128MB), side-channel risks,
+limited scalability for large-
+scale models
+(Chen et al.,
+2023)[5]
+Fixed-point iteration, no mali-
+cious ratio knowledge, rigorous
+error bounds, kernel similarity ro-
+bustness, non-IID stability
+High iterative computation,
+kernel width sensitivity,
+gradient-space only, no back-
+door protection, delayed
+convergence risks
+18
+Chapter 3
+Proposed Methodology
+3.1 Methodology Overview
+The main objective of this study is to develop a MARL framework where multiple
+federated learning clients will act as independent DDPG-based RL agents, which
+will dynamically calibrate differential privacy noise levels per training round, coor-
+dinated via a Value Decomposition Network, while incorporating Byzantine-resilient
+aggregation to simultaneously defend against poisoning attacks and optimize the
+privacy-utility trade-off beyond what static DP-SGD approaches can achieve. The
+design process for this research adopts a methodology that is appropriate based on
+the nature of our data. This complete methodology of the proposed system for
+federated UAV detection and tracking with adaptivity in privacy protection. The
+design method was influenced by several critical objectives such as the requirement
+for precise detection and the integration of dynamic data sources. Also, it endeavors
+to explain what the system does and how design was validated through progressive
+experimentation.
+To achieve this, seven functional stages were set in the pipeline: (1) dataset acquisi-
+tion and preprocessing from the Anti-UAV600 thermal infrared benchmark; (2) ob-
+ject detection utilizing the DamoYOLO model that integrates a TinyNAS backbone,
+GiraffeNeckV2 neck, and ZeroHead anchor-free detection head; (3) computation of
+detection loss for classification loss, bounding box regression loss, and Distribution
+Focal Loss (DFL); (4) federated learning across ten clients where both DP-SGD and
+FedAvg aggregation were considered; (5) adaptive privacy control by dynamically
+selecting the scale of the Gaussian noiseσper round by a DDPG agent; (6) UAV
+trajectory tracking by a SiamFC tracker that employs ResNet18 and VGGMConv1
+networks; (7) evaluation based on mAP@0.5, mAP@0.75, mAP@0.5:0.95, and the
+IR Mixed Measure tracking metric.
+The Design Workflow (Figure 3.1) outlines the process of validation and iteration
+usedtodevelopandvalidatethearchitecture. Thedesignprocessbeginsbyexploring
+the federated learning field broadly, followed by the validation of the baseline, eval-
+uation of standalone components, threat modelling, integration and ablation testing
+of the framework, and lastly testing the datasets in the shifting environments. There
+are two decision gates in the workflow: one to ensure that the integrated model is
+more useful than the individual models alone; the other to ensure that the overall
+framework is Byzantine robust and provably differentially private. If both check-
+19
+points are checked, then the thesis validation is considered to be met.
+The Design Workflow (Figure 3.1) outlines the process of validation and iteration
+usedtodevelopandvalidatethearchitecture. Thedesignprocessbeginsbyexploring
+the federated learning field broadly, followed by the validation of the baseline, eval-
+uation of standalone components, threat modelling, integration and ablation testing
+of the framework, and lastly testing the datasets in the shifting environments. There
+are two decision gates in the workflow: one to ensure that the integrated model is
+more useful than the individual models alone; the other to ensure that the overall
+framework is Byzantine robust and provably differentially private. If both check-
+points are checked, then the thesis validation is considered to be met.
+3.1.1 Design Process
+The design process guiding development of the proposed pipeline is guided by five
+formal objectives that stem from the problem statement. Each element of the
+pipeline was chosen to meet a single or more of these objectives and was set up
+to do so under the limitations of the deployment site.
+Objective O1:Under federated deployment conditions, where raw data cannot be
+moved off the client devices, detect and track UAVs reliably in 640×512 thermal
+infrared frames from the Anti-UAV600 dataset.
+ObjectiveO2:Giveprovableguaranteesofdifferentialprivacy, inthezero-Concentrated
+Differential Privacy (zCDP) framework, to each participating client in each round
+of T communications.
+Objective O3:Using norm-based filtering and cosine similarity clustering be-
+fore FedAvg aggregation, maintain Byzantine resilience against label-flipping and
+gradient-manipulation attacks.
+Objective O4:Dynamically adapt the per-client DP noise scaleσwith a DDPG
+reinforcement learning agent, rather than static noise policies that either under-
+protect when adversarial noise peaks or over-protect when it is low.
+Objective O5:Enable the entire pipeline to be computed by an edge device, while
+reducing the size of the detection backbone to the TinyNAS architecture ( 1.8M
+parameters) and the tracker backbone to the lightweight SiamFC formulation
+The specifications come from these objectives as follows: The input frame resolu-
+tion after preprocessing is 640×512; The outputs of the TinyNAS backbone include
+multi-scale feature maps (80×80, 40×40, 20×20); There are 10 clients in the fed-
+erated setup, each of which has a cumulative privacy budget ofρk; The noise scale
+learned by the DDPG agent is bounded betweenσmin andσ max.
+The main limitations are: (C1) computational, the backbone is compressed inside
+the edge-GPU memory, so that larger alternatives (such as BigNAS) do not apply;
+(C2) privacy, the total amount of zCDP is limited toρkk per client; (C3) communi-
+cation: only model weights, not raw frames, are communicated between clients and
+server; (C4) adversarial: up to 30% of clients can provide Byzantine updates, while
+the aggregation server is honest-but-curious.
+20
+3.1.2 Design Process Workflow
+The proposed framework is developed and validated in the Design Workflow of
+Figure 3.1, which consists of eight stages of design, two binary decision gates. This
+iterative process makes sure that at the appropriate level of system integration
+without empirical verification no architectural decision is accepted.
+Figure 3.1: The Design Workflow
+Stage 1: Explore the Domain of Federated Learning:A systematic review
+of the literature on federated learning was carried out, addressing privacy attack
+vectors (gradient inversion, membership inference, property inference), existing DP
+mechanisms, Byzantine fault models and adaptive noise optimisation techniques.
+This process yielded the baseline approaches to be assessed in Section 3.2, which is
+the taxonomy.
+Stage 2: Focus on Methodologies, Effectiveness and Limitations:Method-
+ologies were ranked on their ability to meet O1 to O5 based on the survey. In Section
+3.3, the design decisions outlined were motivated by key limitations identified in ex-
+isting work: static DP schedules, no Byzantine filtering in centralised aggregation,
+and fixed tracking architectures that did not work well for thermal imagery.
+Stage 3: Baseline Model Performance Validation:Baseline Model Perfor-
+mance Validation, the detection model, DamoYOLO, was trained and validated on
+the Anti-UAV600 dataset, with no federated or private components, to set a detec-
+tion accuracy ceiling. All the following federated and privacy-perturbed variants are
+compared to this baseline mAP.
+Stage 4: Standalone Tracking and Detection Evaluation:The SiamFC
+tracker was evaluated independently with the Anti-UAV600 tracking sequences with
+the IR Mixed Measure. In this isolated evaluation, under thermal imaging condi-
+tions prior to integration with the federated detection pipeline, the tracker has been
+demonstrated to be able to maintain the identity of its target.
+Stage 5 : Reward Function Formulation and Threat Modelling:The Re-
+21
+ward Function Formulation and Threat Modelling stage, a reward function (rt =
+Acc(θt+1)−Acc(θ t)) was formulated and Byzantine attacks were specified as Label
+Flipping, Gradient Manipulation, Sign Flipping, and Random Noise Injection at-
+tacks. This stage sets the stage for an adversarial environment that the integrated
+framework will be stress-tested in.
+Stage 6: Framework Integration and Ablation Testing:The DamoYOLO
+detector, DP-SGD training, DDPG adaptive noise controller, Byzantine-resilient
+FedAvg, and SiamFC tracker were integrated into the unified End-to-End Pipeline.
+Ablation experiments were performed, with the single components being systemat-
+ically removed to determine their contribution to the overall performance.
+Decision Gate 1 : Does the Integrated Model Demonstrate Enhanced
+Utility?
+The design passes the gate and moves forward if it performs better than the stand-
+alone baselines in both mAP and tracking accuracy from the Stages 3 & 4. Other-
+wise, it goes back to Stage 5, where it revises the reward function and the architec-
+ture.
+Stage 7 : Dynamic Dataset Stress-Testing Under Shifting Environments:
+The framework is tested with distribution-shifted data and partitioning with dif-
+ferent Dirichlet concentration parameters for clients, increasing the proportion of
+Byzantine clients, and/or varying the complexity of the scenes in the Anti-UAV600
+sequences.
+Decision Gate 2: Does the Framework Achieve Robustness and Provable
+DP Guarantees?
+The framework should show stability of mAP under stress test conditions and should
+prove that the total amount of privacy costs per client across all rounds is not greater
+than the total amount of privacy costs per client across all clients,∑
+tρkt≤ρ k. In
+case both conditions are satisfied, the thesis is said to be validated.
+3.2 Preliminary Design: Multiple Alternative So-
+lutions
+Four potential design solutions were developed, varying in their methods for detect-
+ing, controlling privacy, aggregating, and tracking.Prior to completing the architec-
+ture depicted in Figure 3.1, four possible design solutions were proposed, each with
+different approaches to detection, privacy control, aggregation and tracking. These
+alternatives have been considered against the requirements R1-R5 (Section 3.1.1)
+and in relation to the functional verification on the Anti-UAV600 set. All four alter-
+natives are described in this section along with their advantages and disadvantages
+and why the chosen design was chosen.
+3.2.1 Problem Constraints and Design Requirements
+All candidate solutions must satisfy the following non-negotiable requirements:
+22
+•R1 Detection Convergence:The federated global model should accurately
+detect an Anti-UAV600 test set with a clearly better accuracy than chance
+(mAP@0.5).
+•R2 Formal DP Guarantee:Each client needs to fulfill the zCDP constraint
+ρk for all T communication rounds, i.e.,∑
+tρkt≤ρ k.
+•R3 Byzantine Resilience:Updates from a minimum of 20 % of the clients
+should not be adversarial otherwise there should be catastrophic degradation
+in accuracy.
+•R4 Budget Compliance:The allocation of noise for each round should not
+cause any client to run out of their overall privacy budget too soon.
+•R5 Edge Feasibility:The detection model must be able to be stored in edge
+devices, while the communication protocol can only send model weights, not
+the raw frames.
+Solutions that satisfy all 5 requirements are further ranked according to Utility-
+privacy trade-off, robustness under adversarial conditions and computational effi-
+ciency.
+Alternative Solutions Considered
+1.Static DP-SGD with Standard FedAvg :Applied Gaussian noise uni-
+formly without any Byzantine filtering across all clients (Static DP-SGD).
+Simple and theoretically sound, but impractical for adversarial situations due
+to low performance of less than 30 Byzantine clients (mAP@0.5 < 0.30).
+2.Rule-Based Adaptive Noise with Norm-Clipping :Applied linearly
+decaying noise with a fixed norm threshold to filter updates. Provided some
+improvement, but suffered from stealthy sign flipping attacks and degraded the
+mAP by 4–6% in Non-IID splits due to over-rejection of legitimate updates.
+3.Centralised DQN with Cosine Similarity Filtering :One DQN agent
+learned the global noise parameters based on accuracy trends. Heuristic sched-
+ules were superior to this, but because of uniform noise across heterogeneous
+clients, the budgets were unevenly consumed and a 2.1% mAP difference was
+found due to coarse discretisation of actions.
+4.Proposed MARL-DDPG with Byzantine-Resilient FedAvg :In the
+proposed framework, one DDPG agent is deployed for each client, and the
+noise level is a continuous action in the Dec-POMDP formulation that is se-
+lected independently by the DDPG agent for each client based on the local
+state. The shared actor critic network eliminates the need for inter-agent com-
+munication for cooperative learning, and the Action Mapping Module ensures
+that the zCDP budget constraints are satisfied by using convex quadratic
+programming. Two-stage Byzantine-Resilient FedAvg (norm-based filtering
++ cosine similarity clustering) is used for aggregation. Detection is done by
+DamoYOLO, and tracking is done by SiamFC. All clients achieved mAP@0.5
+23
+improvements when the verification was done on the basis of non-adaptive
+baseline with full budget compliance. Some disadvantages are: early round
+privacy costs with DDPG exploration and per-round computation costs with
+Byzantine detection.With combining FL and MARL we got better results con-
+sidering mAP (Figure 3.3)
+Figure 3.2: mAP vs communication round
+Figure 3.3: FL with MARL drone detection,mAP per episode
+24
+Figure 3.4: Noise level vs the rounds for differentρ
+Some disadvantages are: early round privacy costs with DDPG exploration and
+per-round computation costs with Byzantine detection.
+3.2.2 Comparative Justification and Design Selection
+Table 3.1 summarises the evaluation of all four candidate solutions against the five
+design requirements and three performance criteria.
+Table 3.1: Comparative Evaluation of Alternative Design Solutions
+Criterion Static DP +
+F edA vg
+Rule-Based
+Adaptive
+Centralised
+DQN
+Pro-
+posed MARL
+(Selected)
+R1: Detection
+Convergence
+Yes Yes Yes Yes
+R2: Formal DP
+Guarantee
+Yes Yes Partial Yes
+R3: Byzantine
+Resilience
+No Partial Yes Yes
+R4: Budget Com-
+pliance
+Yes Yes Partial Yes
+R5: Edge Feasi-
+bility
+Moderate Yes Yes Yes
+Utility-Privacy
+Trade-off
+Poor Moderate Good Best
+Robustness (30%
+Byzantine)
+Low Moderate High Highest
+Computational
+Overhead
+Low Low Moderate Moderate
+Hence, the proposed MARL design is the only one that meets all five design needs,
+as well as gives the best utility-privacy trade-off and the highest robustness when
+25
+considering adversarial conditions. It is therefore chosen as the final design and the
+architecture detailed in Chapter 4.
+3.3 Base Model Selection and Justification
+The proposed pipeline incorporates four different technological components, namely
+the detection model, the tracker, the RL agent, and the aggregation rule, where each
+of these components needs a selection decision. This section provides a description
+of the selection of each base model that was selected in comparison to principal
+alternatives and based on the pipeline specification of Figure 3.1 and the constraints
+of Section 3.1.1.
+3.3.1 Detection Backbone: DamoYOLO (TinyNAS + Gi-
+raffeNeckV2 + ZeroHead) vs. Alternatives
+The detection model is required to process 640×512 frames of thermal IR images and
+generate multi-scale feature maps of the images at scales 80×80, 40×40 and 20×20,
+and fit into the edge federated clients memory constraints (Constraint C1). Three
+architectures were compared: YOLOv8-nano, MobileNetV3-SSD and DamoYOLO.
+YOLOv8-nano:YOLOv8-nano has a robust training ecosystem and performs well
+on standard RGB benchmarks. However, it has an anchor-based detection head that
+needs to be configured with prior box size which is unsuitable for the highly vari-
+able aspect ratio of the thermally-imaged UAV under different altitude and range
+conditions. Additionally, it has a higher number of parameters ( 3.2M) compared
+to DamoYOLO TinyNAS backbone ( 1.8M), which limits its applicability on edge
+hardware with limited resources.
+MobileNetV3-SSD:MobileNetV3-SSD is one of the smallest detectors ever built
+( 2.5M parameters), and is suitable for mobile inference. The SSD detection head
+however has the function to fix anchor boxes and is not very effective when the object
+to be detected is small-size, which is the case in the Anti-UAV600 thermal sequences
+from which UAVs appear as small heat signatures at long distance. Anti-UAV600
+can achieve mAP@0.5 of about 14% lower than DamoYOLO for the standalone test,
+so will be disqualified in R1.
+DamoYOLO (Selected):DamoYOLO uses the TinyNAS backbone architec-
+ture[4], whichfeaturesCrossStagePartial(CSP)blocksforeffectivefeaturereusabil-
+ity, and a multi-scale context aggregation module (SPP) with pooling windows of
+5×5, 9×9, and 13×13. The GiraffeNeckV2 neck carries out multi-scale feature pyra-
+mid fusion at three different output resolutions: 80x80, 40x40 and 20x20, in both
+forward and backward directions. The ZeroHead anchor-free detection head suffers
+no disadvantage of manually designed priors, and is based on a more numerically
+stable DF formulation (both Generalised Focal Loss (GFL) and Distribution Focal
+Loss (DFL)) than anchor-based regression heads under DP-SGD gradient clipping.
+The Anti-UAV600 is the benchmark used here for the three candidates, and this
+combination yields the best mAP@0.5 along with meeting Constraint C1.
+26
+Table 3.2: Detection Backbone Comparison
+Architec-
+ture
+Parameters mAP@0.5
+(Anti-
+UAV600)
+Anchor-Free Edge
+Feasibility
+YOLOv8-
+nano
+3.2M Moderate No Moderate
+MobileNetV3-
+SSD
+2.5M Low No High
+DamoYOLO
+(Selected)
+1.8M Highest Yes High
+3.3.2 RL Agent: DDPG vs. Alternatives
+An RL agent has to choose a continuous noise scaleσkt∈[σ min,σ max]for each of the
+K=10 clients in each of the T communication rounds. It’s a problem with an inher-
+ently continuous action space, therefore algorithms with only discrete actions are not
+applicable. The three algorithms tested here were Deep Q-Network (DQN), Proxi-
+mal Policy Optimisation (PPO) and Deep Deterministic Policy Gradient (DDPG).
+DQN:DQN operates on discrete action spaces. The continuous noise range should
+be divided into bins so that the DQN can work. This coarse discretisation is un-
+suitable near the convergence as demonstrated in Solution 3 (Section 3.2.4) where
+fine noise adjustments are the critical factor to ensure efficient use of the privacy
+budget. The second drawback of DQN is the need to have one policy per agent,
+meaning that having K=10 clients without sharing agent parameters is impractical.
+PPO:PPO is an algorithm that needs a new environment interaction for every pol-
+icy update. In the federated scenario, one interaction with the environment is one
+round of communication. On policy learning is thus sample-inefficient, especially in
+the initial exploration phase of the DDPG training loop.
+DDPG (Selected):DDPG is an off-policy, deterministic actor-critic algorithm
+with a continuous output, ranging from [0, 1] and subsequently scaled to[σmin,σ max]
+= [1, 20] using a sigmoid activation function. It has a deterministic policy directly
+suitable for Action Mapping Module, where an affine transformation is applied to
+enforce the cumulative zCDP budget constraint using convex quadratic program-
+ming. Experience replay buffer and target network stabilisation help to stabilize
+training in the non-stationary federated environment. The main idea of parameter
+sharing is to make the network much simpler: all K client actors and critics share
+one common actorπ(s)and one common critic Q(s, a) with three fully connected
+layers, significantly reducing the computation overhead. Thus, for this problem, the
+RL agent algorithm is chosen to be DDPG, as in Figure 3.1.
+27
+Table 3.3: RL Agent Algorithm Comparison
+Algorithm Action
+Space
+Sample
+Efficiency
+Budget
+Compliance
+Parameter
+Sharing
+YOLOv8-
+nano
+3.2M Moderate No Moderate
+MobileNetV3-
+SSD
+2.5M Low No High
+DamoYOLO
+(Selected)
+1.8M Highest Yes High
+3.3.3 FL Aggregation Rule: Byzantine-Resilient FedAvg vs.
+Alternatives
+The aggregation rule, as discussed above, must be such that it comes up with an
+updated global model by aggregating accepted client updates, while also meeting R3
+(Byzantine Resilience). Three aggregation strategies were considered: standard Fe-
+dAvg, Coordinate-wise Median (Median-Fed) and the proposed Byzantine-Resilient
+FedAvg (BR-FedAvg).
+Standard FedAvg:Standard FedAvg (as illustrated in the Design Workflow (Fig-
+ure 3.1)) combines client updates with a weight proportional to the size of the
+respective dataset. If a Byzantine filtering step is not included, then any malicious
+update that a client submits is included in the weighted average. Total failure was
+observed on Byzantine clients with 30% of the clients. Only standard FedAvg is
+kept as a reference.
+Coordinate-wise Median (Median-Fed):Median-Fed calculates the median
+of all the updates submitted for each individual coordinate, probably robust to a
+bounded fraction of Byzantine clients. In contrast, under Non-IID data partition-
+ing (Anti-UAV600 client split) the coordinate-wise median of heterogeneous benign
+updates gives a misleading estimate of the actual aggregate gradient, resulting in a
+3.1% drop in mAP performance when compared with BR-FedAvg on the Non-IID
+Anti-UAV600 partition.
+BR-FedAvg (Selected):The proposed Byzantine-Resilient FedAvg uses a two-
+stage pipeline prior to aggregation. Stage 1 uses norm-based filtering by calculating
+a dynamically changing reject threshold based on the median of previous update
+norms, and reject large-magnitude poisoning attacks without manual tuning of the
+threshold. Stage 2 cosine similarity clustering groups the norm-filtered updates and
+separates the cluster of majority directions, thus discarding stealthy attacks such as
+sign-flipping and manipulation of the gradient direction. The data-weighted FedAvg
+aggregation accepts only the updates of the majority cluster. This way, you can re-
+tain the Non-IID convergence properties of FedAvg with the addition of two-tier
+Byzantine robustness. The proposed framework chooses BR-FedAvg as the aggre-
+gation rule.
+28
+Table 3.4: FL Aggregation Rule Comparison
+Aggregation
+Rule
+Byzantine
+Tolerance
+Non-
+IID Perfor-
+mance
+Stealthy
+Attack De-
+fense
+Computa-
+tional Cost
+Standard Fe-
+dAvg
+None High None Low
+Coordinate-
+wise Median
+Moderate Reduced Partial Moderate
+BR-FedAvg
+(Selected)
+High High Yes(2-stage) Moderate
+The fact that DamoYOLO is selected as the detection model, SiamFC is the tracker,
+DDPG is the RL agent, and BR-FedAvg is the aggregation rule all in all determines
+the architectural basis of the proposed End-to-End Pipeline, as depicted in Figure
+3.1. Further specification details for individual components are given in Chapter 4.
+3.4 Dataset Collection and Preparation
+3.4.1 Anti-UAV600 Thermal Dataset
+The Anti-UAV600 dataset [2] is a large-scale thermal infrared benchmark especially
+tailored for UAV detection and tracking in challenging real-world conditions. It
+consists of 600 thermal video sequences recorded by infrared cameras under various
+environmental conditions such as day, night, fog and various altitudes. Annota-
+tions for UAV bounding boxes are included in each frame allowing for detection and
+tracking evaluation. There are many difficulties in the dataset including the very
+small size of the target (drones) in thermal images, the low contrast between the
+drone and background, and the lack of texture and colour cues in RGB images. All
+of these features make it a challenging and realistic standard for the evaluation of
+the counter-UAV system.
+Anti-UAV600 is the only set to be used for training, validation and evaluation in this
+study. They are trained under and evaluated on this thermal data set, which mim-
+ics the deployment scenario of all the model components, including the TinyNAS
+backbone and the SiamFC tracker in the context of real-world counter-UAV systems.
+3.4.2 DataPreprocessing: Mosaic, MixUp, andScale-Aware
+Augmentation
+To make the model more robust to small targets and the different backgrounds,
+all training frames are passed through a three-stage augmentation pipeline before
+training.
+By generating a composite image from four randomly-chosen frames, Mosaic Aug-
+mentation allows to capture multiple drone appearances and backgrounds in one
+training sample. The idea was popularized in YOLOv4, which greatly enhances the
+effective training distribution without requiring large datasets and also decreases
+29
+the training batch size.
+In MixUp Augmentation, two different training images are randomly mixed in a
+proportion ofλbetween 0 and 1, resulting in a soft label training sample. Regular-
+ization is a method which decreases overconfidence and enhances the generalization
+of low contrast thermal targets with unclear boundaries between classes.
+Scale-Aware Augmentation resizes the image with random scale factors from a set
+rangetomakethedetectorlearntogeneralisebetweendifferentdistancesandheights
+of drones. This is especially important in the instance of Anti-UAV600 where the
+dataset benchmark evaluation shows that the apparent size is very different for the
+different sequences.
+All the frames are resized to a fixed resolution to be used for batching. The values
+of each pixel are normalized to [0, 1] and are grouped into mini-batches for training
+on each federated client site.
+3.4.3 Data Integration
+Since the proposed framework is based on Federated Learning, data integration does
+not mean consolidating data into a central data repository. Instead, integration is a
+structured partition and logical assignment of Anti-UAV600 sequences among K =
+10 participating clients, which ensures faithful representation of the distribution of
+the entire dataset among the clients, while maintaining the data isolation constraint
+imposed by federated constraints.
+The 600 thermal videos are first broken down into frames using OpenCV (as illus-
+trated in Module 1 in Figure 3.2), each of which is accompanied by the correspond-
+ing bounding box annotation. Before the client assignment, frames are catalogued
+by environmental condition (day/night/fog/swapping altitude at time to time) and
+drone flight pattern. Then Sequences are assigned in two ways of integration.
+In the case of the IID integration strategy, the sequences are randomly shuffled, and
+then split into 10 equal parts of 48 sequences, such that each client has a represen-
+tative sample of the overall sequence distribution. This is the controlled baseline of
+the framework performance, when there is no data heterogeneity.
+In the Non-IID integration strategy, sequences are distributed according to a Dirich-
+let distribution with concentration parameterα= 0.5, which yields the heteroge-
+neous local distributions in which individual clients might be localizing mainly se-
+quences that belong to certain environmental conditions or drone flight patterns.
+This closely mimics in real life deployments when a geographically distributed set of
+nodes for thermal surveillance of individuals will naturally have skewed data locally.
+In both instances, there is no data crossing client boundaries as there is no thermal
+data involved.
+3.4.4 Data Reduction
+As the name Anti-UAV600 implies, it is comprised of 600 continuous thermal video
+segments with up to 640×512 resolution, so naive inclusion of all these frames will
+lead to significant temporal redundancy: in low-motion parts of a video, consecutive
+frames carry near-identical spatial information, which will bias the local client dis-
+30
+tributions toward background-dominated frames. After the extraction of the frames,
+before the data is augmented, a two-step data reduction process is applied.
+Frame Subsampling: The video sequences are subsampled at a fixed temporal stride,
+with every nth frame of the stream retained, instead of the entire frame-rate stream.
+This helps to remove near duplicate consecutive frames while maintaining temporal
+diversity in each flight sequence based on different drone flight phases (approach,
+hover, departure). The stride is chosen so that there are enough annotated frames
+per sequence to be able to have local training on each of the 10 clients.
+Background-Heavy Frame Filtering: In many Anti-UAV600 frames, the drone is
+only about 100 pixels, so a lot of frames in a sequence can have a drone, which
+may be occluded in the frame, at the frame border, or simply not visible. If the
+area of the annotated drone bounding box in the frame is less than a minimum
+pixel threshold, the frame is discarded from the training split and does not provide
+a strong positive supervision signal because it also contributes to the ratio of the
+background class. The reason behind these frames being kept in the evaluation split
+is to ensure consistency with the original Anti-UAV600 benchmark protocol.
+After each reduction, retained frames are checked to ensure that a frame is always
+retained for each sequence to ensure that the frame is always annotated. The re-
+duced frame set is then sent to the five-technique augmentation pipeline described
+in 3.3.1 to generate the final 640×640 training sample set which is input into the
+DAMOYOLO detection model.
+3.4.5 Summary of Processed Data
+Following dataset collection, preprocessing, transformation, integration, and reduc-
+tion, the final processed dataset is summarized in Table 3.5.
+Table 3.5: Summary of the processed Anti-UAV600 dataset after all preprocessing,
+integration, and reduction steps.
+Property Value
+Total sequences (Anti-UAV600) 600
+Training sequences 480
+Validation sequences 60
+Test sequences 60
+Federated clients (K) 10
+Training sequences per client (IID) 48
+Raw frame resolution 640×512 (thermal IR)
+Model input resolution 640×640
+Frame loading tool OpenCV
+Pixel value range [0, 1] (normalized)
+Augmentation techniques Mosaic (4→1), MixUp (15%), Scale-
+Aware, Box-level Color, Box-level Ge-
+ometric
+Partitioning strategies IID (random shuffle), Non-IID (Dirich-
+letα= 0.5)
+Annotation format Drone bounding boxes per frame
+31
+There is no data shared at boundaries between all the clients and each client is given
+non-overlapping subsets of training sequences. The validation and test sequences are
+stored centrally and are only used for evaluation of the model in a global way. This
+processed dataset is directly used as input to the DAMOYOLO federated training
+pipeline in 3.4.
+3.5 Results and Analysis
+As per our objective of this study, to train a model using a lots of data without
+hampering privacy with the help of DP noise. On working towards this objective,
+the results show that all the noise scheduling methods can be effective in maintain-
+ing high UAV detection performance while preserving privacy guarantees for the
+differential privacy of federated clients. The Exponential method has the best final
+mAP@0.5 of 0.9927, and the proposed DR-based adaptive scheduler, though dynam-
+ically spreading the privacy budget across communication rounds, still holds its own
+with an F1 score of 0.990, which demonstrates that adaptive noise injection does not
+greatly undermine the utility of detection. The trajectory further shows that DRL
+has a larger and more flexible noise space (¯σt∼1.70–1.78) than the static Uniform
+scheduler, corroborating its ability to offer enhanced formal zCDP guarantees for
+sensitive rounds without compromising the overall model convergence. These re-
+sults confirm the basic thesis goal: the ability to securely distribute an aggregation
+server to secure sensitive operational data (such as flight time, position, flight visual
+signatures etc.) of federated drone surveillance clients without negatively impacting
+the accuracy and generalizability of the global detection model.
+Table 3.6: Summary of the processed Anti-UAV600 dataset after all preprocessing,
+integration, and reduction steps.
+Method Final mAP@0.5 Mean mAP@0.5
+DRL 0.9312 0.9747
+Uniform 0.9791 0.9841
+Exponential 0.9927 0.9756
+Arithmetic 0.9776 0.9763
+Figure 3.5: Confusion Matrix of all methods
+32
+Figure 3.6: Privacy Utility Tradeoff Trajectory across Communication Rounds
+Figure 3.7: Noise level Allocation across Communication Rounds
+33
+Chapter 4
+4.1 Detection Model Architecture
+4.1.1 TinyNAS Backbone (CSP + SPP + Strided Convo-
+lution)
+TinyNAS backbone is a light neural network backbone for Capable of deployment in
+resource limited environments and competitive feature extraction for small thermal
+targets. It incorporates three important structural components. The feature map is
+divided into two branches at each stage by Cross Stage Partial (CSP) blocks and the
+output of the series of residual layers is then fused with the output from the other
+branch. It halves the cost of gradient duplication during backpropagation, and saves
+memory usage without sacrificing representational ability. Wang et al. showed that
+CSP blocks can decrease the computation by around 20% without compromising or
+even improving the accuracy of the standard benchmarks. Spatial Pyramid Pooling
+(SPP) is an implementation of parallel processing.
+Instead, it implements max-pooling across a number of kernel sizes (e.g., 5×5, 9×9,
+13×13) and then concatenates the results, allowing the backbone to learn about
+multiple scales of context within a single model layer, and without having to de-
+pend on fixed-size inputs. This is critical to capture the context of small drones in
+complex thermal backgrounds. Strided Convolution is an approach that uses learn-
+able strided convolutions instead of traditional approaches that rely on pooling to
+downsample feature maps, which is followed by many current detection architectures
+. They are used together to generate rich, multi-scale feature representation for the
+downstream GiraffeNeckV2 fusion module to get the TinyNAS backbone to work.
+4.1.2 GiraffeNeckV2: Multi-Scale Feature Fusion
+Such a feature pyramid network variant is GiraffeNeckV2 which adds bidirectional
+cross-scale connections to the original Feature Pyramid Network (FPN).It generates
+threefeaturemapsfordetectionwithvaryingspatialresolutionstoallowittoprocess
+drones at small, medium and large apparent sizes. The neck utilizes the depthwise
+separable convolution to achieve a high level of quality of multi-scale fusion while
+simultaneously reducing the number of parameters. For the thermal UAV detection,
+the targets can be seen as a single or few pixels in long-range surveillance scenarios,
+34
+therefore this is crucial.
+4.1.3 ZeroHead: Anchor-Free Detection
+The ZeroHead is an anchor-free detection head that predicts bounding boxes directly
+from feature map locations without relying on predefined anchor configurations,
+following the design principles established by FCOS. For each spatial location on
+each feature map level, ZeroHead predicts:
+•A classification score for the drone class.
+•A bounding box regression offset (center-x, center-y, width, height).
+•A Distribution Focal Loss (DFL) regression target representing the probability
+distribution over discrete bounding box edge offsets
+Eliminating anchors removes the need for manual anchor design and reduces the
+sensitivity of the detector to scale distribution assumptions, which is especially ben-
+eficial for Anti-UAV600 where drone sizes span a wide range.
+4.1.4 Detection Loss
+The total detection loss is a weighted sum of three components:
+•Classification loss (cls):Varifocal loss between predicted class scores and
+quality-weightedground-truthlabels, improvingdetectionofhardlow-confidence
+examples such as small thermal drones.
+•Bounding box regression loss (bbox):Complete Intersection over Union
+(CIoU) loss between predicted and ground-truth boxes, penalizing center off-
+set, aspect ratio, and overlap simultaneously for tighter localization.
+•Distribution Focal Loss (dfl):Cross-entropy loss over the discrete edge
+distribution predictions enabling finer sub-pixel bounding box regression.
+The combined loss is:
+Ltotal =λ cls·L cls +λ bbox·L bbox +λ dfl·L dfl
+whereλ cls,λ bbox, andλdfl are empirically tuned weighting coefficients.
+4.2 Federated Learning Client Setup
+The federated learning environment is set up with K = 10 nodes (clients), each with
+a different partition of the Anti-UAV600 training sequences. To make this possible,
+a collaborative training approach called Federated Learning (FL) is used, which does
+not centralize any raw thermal footage. This setup is close to actual counter UAV
+scenarios in which each thermal camera has to be used by a different organization,
+and thus it is not possible to share raw video data among them due to sensitivity
+and regulatory requirements.
+35
+4.2.1 Client Configuration
+At the start of training, each clientk∈{1,2,...,10}starts with a local copy of
+the global detection model parametersθ0. Each client trains E epochs on their own
+machine. The local training is done with a gradient clipping bound C = 1.0, applied
+prior to the noise injection, which bound each local update in the DP-SGD scheme
+based on L2 sensitivity.
+The model per round DP-FL process involves the client k setting their local model
+toθ t at the beginning of each round, performing local training, and sending the new
+parameters back to the central server.
+4.2.2 Privacy Budget Assignment
+A heterogeneous privacy budgetρk is given for each client, which is sampled uni-
+formly from a pre-defined range following the framework zero-Concentrated Differ-
+ential Privacy (ρ-zCDP) to represent different regulatory and sensitivity constraints
+of different data owners. The kinder the client’s surveillance footage the narrower
+the budget (smallerρk) and the more generous the client’s budget (largerρk) the
+less sensitive the data. We observe the federated learning literature to reflect this
+reality: federated deployments often have different data owners that have to deal
+with different regulatory constraints.
+4.2.3 IID and Non-IID Partitioning
+The Anti-UAV600 sequences are distributed among clients with both IID and Non-
+IID conditions to assess the robustness when dealing with realistic federated con-
+ditions. The Non-IID setting assumes that the sequences are partitioned using a
+Dirichlet distribution with concentration parameterα= 0.5 , which leads to non-
+uniform local distributions, where different clients may have different types of se-
+quences, with different environmental conditions or drone flight patterns. This par-
+titioning method is very similar to how it would be deployed in practice, where there
+are naturally skewed distributions of data in the local area captured by individual
+surveillance nodes.
+4.3 DP-SGD with DDPG-Guided Adaptive Noise
+Selection
+4.3.1 DP-SGD Mechanism
+In local training, privacy protection is done by using Differentially Private Stochas-
+tic Gradient Descent (DP-SGD). Every mini-batch of local training, the following
+operations are performed:
+1. Compute per-sample gradients:∇L(x,y;θ t
+k)
+2. Clip each gradient to bound L2-norm:∇L←∇L·min(1,C/∥∇L∥ 2)
+3. Compute the mean clipped gradient over the mini-batch.
+36
+4. Add Gaussian noise calibrated to the client’s current noise levelσt
+k: noisy
+gradient = mean clipped gradient+N(0,(σt
+k)2·C 2·I)[12]
+5. Update the local model:θt
+k←θ t
+k−η×noisy gradient
+Every time this procedure is executed, itsρ-zCDP privacy guarantees per round are
+satisfied, where the per-round privacy cost for client k at round t is:
+ρt
+k = 2E
+(σt
+k)2
+4.3.2 DDPG Agent for Adaptive Noise Selection
+Instead of using a fixed noise level, the noise level for each client is dynamically de-
+termined on every communication round using a Deep Deterministic Policy Gradient
+(DDPG) reinforcement learning agent. The action space for noise selection is con-
+tinuous and DDPG is a searcher that is designed for continuous action spaces with
+deterministic policies. This adaptive approach is inspired by the Dynamic Noise
+Optimization through Reinforcement Learning (DNO-RL) approach, which showed
+that an RL agent can optimize and dynamically modulate noise levels according
+to the dynamics of the training process, namely: lower noise during unstable peri-
+ods and higher noise during critical convergence points, thereby achieving a better
+privacy-utility trade-off than static noise levels.
+The agent sees a local statest
+k = (t,ρremaining_k) (current round index divided by T
+and remaining privacy budget divided by its initial value) and emits a continuous
+noise actiona t
+k =σ t
+k, whereσ t
+k is a value in the interval[σ min,σ max]. To adapt
+this to a fully decentralized multi-client federated setting, we apply this single-agent
+DNO-RL approach in a multi-agent framework.
+Reward Function:The aggregated global reward signal at each round is the global
+model detection performance improvement (mAP) after aggregation:
+rt =mAP(θ t+1
+G )−mAP(θ t
+G)
+This reward will encourage agents to choose noise levels that collectively enhance
+the detection quality, while allowing agents to set their own privacy budgets. If the
+raw action would breach the remaining budget constraint, each agent’s raw action
+is projected onto the closest noise level that is achievable within the budget via an
+affine transformation to ensure strict adherence to the budget constraint.
+4.4 Byzantine-Resilient FedAvg Aggregation
+4.4.1 Byzantine Detection
+The central server performs a two-stage Byzantine filtering on all client updates
+submitted and filters out any updates it receives more than twice from any one
+client. Poisoned and manipulated data to the server to influence the results of the
+training process, as is well known in standard FedAvg. Here, a filtering mechanism
+is described which addresses this threat.
+The first stage uses norm-based filtering, in which the L2-norm of each client update
+∥θt
+k−θ t∥2 is compared with a dynamic thresholdτthat is based on the median of
+the past norms of updates. Significant deviations are indicated as possible outliers.
+The median is set based on the historical "norm", not a fixed value, and provides
+hyperparameter-free adaptation to the changing distribution of client updates.
+37
+The second stage is cosine similarity clustering; An update direction that is not
+aligned with the majority cluster is excluded. The two stages approach is effective
+asByzantineattacksareeitherofsignificantsize(whichisdetectedbynormfiltering)
+or of updates that are propagated in directions which go against the majority opinion
+(which is detected by cosine filtering) as shown experimentally.
+4.4.2 Aggregation
+If both the filters are passed, then passing clients are added to the Accepted_Setfor
+the current round . The weight average vote is then used for updating the global
+detection model, but only using accepted updates:
+θt+1
+G =
+∑
+k∈Accepted_Set|Dk|·θt
+k∑
+k∈Accepted_Set|Dk|
+This Byzantine-resistant FedAvg design is able to resist the poisoning of the global
+detection model even if up to 30% of the clients are adversarial.
+4.5 SiamFC Tracking
+Once detected, the positions of the confirmed drones are sent to a SiamFC (Siamese
+FullyConvolutional)trackerforfurthertemporallocalizationovertheframes. SiamFC
+canlearnanofflinesimilaritymetricbetweenatargettemplatepatch, extractedfrom
+the 1st frame of detection, and candidate patches in the following frames. For each
+new frame, the tracker calculates a response map for the cross-correlation between
+the template and a larger search region and positions the drone at the position of
+maximum cross-correlation response.
+SiamFC is selected due to its real-time processing and its ability to work in the
+case of limited appearance cues in thermal imagery. In the context of counter-UAV
+applications, which have strict latency requirements showed that the fully convo-
+lutional formulation is suitable for tracking at frame rates above 58 fps and that
+it is an efficient, end-to-end learned tracking system. It is no longer required to
+fine-tune the tracker online, thus it is deployable directly after federated training of
+the detection model without additional per-sequence adaptation.
+4.6 Evaluation strategies
+System performance is evaluated using two complementary metrics:
+•mAP (mean Average Precision): The standard object detection metric com-
+puted over IoU thresholds, measuring the precision-recall trade-off of the drone
+detector across all test sequences.
+•IR Mixed Measure: A composite metric designed for thermal infrared track-
+ing benchmark, combining success rate (overlap-based tracking accuracy) and
+precision score (center-location error), providing a holistic evaluation of both
+detection and tracking performance on Anti-UAV600 thermal sequences.
+38
+4.6.1 Overview
+This chapter includes the results obtained from the evaluation of the proposed pri-
+vacy preserving federated learning system for drone detection and tracking on Anti-
+UAV600 thermal infrared dataset activity, (ii) prevention and protection, (iii) risk
+mitigation, and (iv) recovery and reconstruction.It is organized around four key ar-
+eas: (i) detection and activity, (ii) prevention and protection, (iii) risk mitigation
+and (iv) recovery and reconstruction.
+The tracking accuracy against baseline methods, (ii) Byzantine client attacks such
+as label-flipping and gradient manipulation and (iii) privacy budget utilization effi-
+ciency per training round forρ-zCDP and (iv) the adaptive noise behaviour learned
+by the DDPG agents over training rounds.
+All experiments are conducted with the Anti-UAV600 thermal dataset with two
+different data partitioning strategies: IID and Non-IID client data partitioning.
+mAP is used to report results, along with the IR Mixed Measure. If applicable,
+results are reported as mean±standard deviation of five independent runs where
+random seeds were used to obtain the results and ensure statistical reliability.
+39
+Chapter 5
+Conclusion
+5.1 Summary of Findings
+This research advances the state of trustworthy machine learning by bridging the
+gap between adaptive privacy preservation and Byzantine resilience in decentralized
+environments. The primary contribution is the development of a Multi-Agent Rein-
+forcement Learning (MARL) framework that transforms Differential Privacy (DP)
+from a static constraint into a dynamic defensive mechanism. Unlike traditional ag-
+gregation methods that often fail under the combined pressure of noise injection and
+adversarial poisoning, this framework introduces the Dynamic Noise Optimization
+(DNO-RL) method. This method intelligently calibrates Gaussian noise levels by
+analyzing the variance and reliability of local updates, effectively masking sensitive
+data while simultaneously isolating anomalous Byzantine contributions. Further-
+more, by optimizing the privacy-accuracy trade-off in real-time, this work provides
+a scalable solution that maintains model integrity and convergence speed even under
+sophisticated label-flipping and gradient-manipulation attacks, offering a provable
+DP guarantee without the catastrophic utility loss common in existing literature.
+5.2 Recommendations for Future Work
+While this framework establishes a robust foundation for adaptive security, sev-
+eral avenues for future research remain to be explored to enhance its practical de-
+ployment. Subsequent studies should focus on extending the MARL controller to
+handle extreme data heterogeneity (Non-IID), as current robust aggregators still
+exhibit performance degradation when local data distributions vary significantly
+across clients. There is also a critical need to investigate the communication over-
+head associated with MARL training, potentially through the integration of sparse
+communication techniques or model compression to ensure the framework is viable
+for resource-constrained IoT devices. Additionally, future work could incorporate
+Hardware-Assisted Security, such as Trusted Execution Environments (TEEs), to
+provide an extra layer of protection for the MARL policy updates themselves against
+server-side compromise. Finally, expanding the threat model to include stealthy
+backdoor attacks and evaluating the system in high-stakes real-world domains, such
+as robotic-assisted surgery or financial fraud detection, will be essential to validat-
+ing the long-term reliability and safety of adaptive privacy-preserving collaborative
+learning.
+40
+Bibliography
+[1] H. H. Zhuo, W. Feng, Y. Lin, Q. Xu, and Q. Yang, “Federated deep reinforce-
+ment learning,”IEEE, 2020.
+[2] N. Jiang et al., “Anti-uav: A large-scale benchmark for vision-based uav track-
+ing,”T-MM, 2021.
+[3] L. Zhao, J. Jiang, B. Feng, Q. Wang, C. Shen, and Q. Li, “Sear: Secure and
+efficient aggregation for byzantine-robust federated learning,”IEEE Transac-
+tions on Dependable and Secure Computing, vol. PP, pp. 1–1, Jun. 2021.doi:
+10.1109/TDSC.2021.3093711
+[4] X.Xuetal.,“Damo-yolo:Areportonreal-timeobjectdetectiondesign,”arXiv
+preprint arXiv:2211.15444, 2022.
+[5] H. Chen, X. Chen, L. Peng, and R. Ma, “Flram: Robust aggregation technique
+for defense against byzantine poisoning attacks in federated learning,”Elec-
+tronics,vol.12,no.21,2023,issn:2079-9292.doi:10.3390/electronics12214463
+[Online]. Available: https://www.mdpi.com/2079-9292/12/21/4463
+[6] G. Wang, X. Liu, Y. Zheng, Z. Zhang, and Z. Cai, “Dno-rl: A reinforcement-
+learning-based approach to dynamic noise optimization for differential pri-
+vacy,”Applied Sciences,vol.13,no.5,p.3235,2023.doi:10.3390/app13053235
+[7] M. Fang et al., “Byzantine-robust decentralized federated learning,” inPro-
+ceedings of the 2024 ACM SIGSAC Conference on Computer and Communi-
+cations Security (CCS), Also available as arXiv:2406.10416, 2024.
+[8] M. Fang et al., “Byzantine-robust decentralized federated learning,” inPro-
+ceedings of the 2024 on ACM SIGSAC Conference on Computer and Com-
+munications Security, ser. CCS ’24, Salt Lake City, UT, USA: Association
+for Computing Machinery, 2024, pp. 2874–2888,isbn: 9798400706363.doi:
+10.1145/3658644.3670307 [Online]. Available: https://doi.org/10.1145/
+3658644.3670307
+[9] S. Li, E. C.-H. Ngai, and T. Voigt, “An experimental study of byzantine-robust
+aggregation schemes in federated learning,”IEEE Transactions on Big Data,
+vol. 10, no. 6, pp. 975–988, Dec. 2024,issn: 2372-2096.doi: 10.1109/tbdata.
+2023.3237397 [Online]. Available: http://dx.doi.org/10.1109/TBDATA.2023.
+3237397
+[10] A. Song, H. Li, K. Cheng, T. Zhang, A. Sun, and Y. Shen, “Guard-fl: An
+umap-assisted robust aggregation for federated learning,”IEEE Internet of
+Things Journal, vol. 11, no. 16, pp. 27557–27570, 2024.doi: 10.1109/JIOT.
+2024.3399259
+41
+[11] M. T. Hossain, S. Badsha, H. La, S. Islam, and I. Khalil, “Exploiting gaussian
+noise variance for dynamic differential poisoning in federated learning,”IEEE
+Transactions on Artificial Intelligence, vol. 6, no. 11, pp. 2922–2939, 2025.
+[12] M. T. Hossain, S. Badsha, H. La, S. Islam, and I. Khalil, “Exploiting gaussian
+noise variance for dynamic differential poisoning in federated learning,”IEEE
+Transactions on Artificial Intelligence, vol. 6, no. 11, pp. 2922–2939, 2025.
+doi: 10.1109/TAI.2025.3540030
+[13] J. K. Szeląga, J.-J. China, and S.-C. Yip,Adaptive adversaries in byzantine-
+robust federated learning: A survey, ePrint IACR 2025/510, 2025.
+[14] U. Zafar, A. Teixeira, and S. Toor,Robust federated learning against poison-
+ing attacks: A gan-based defense framework, arXiv preprint arXiv:2503.20884,
+2025.
+[15] Z. Zeng, S. Yang, and G. Ding, “Robust aggregation algorithms for feder-
+ated learning in unreliable network environments,”Journal of Computing and
+Electronic Information Management, 2025.
+[16] H. Chen, X. Chen, L. Peng, and R. Ma,Flram: Robust aggregation technique
+for defense against byzantine poisoning attacks in federated learning, Preprint.
+[17] Z. Chen, G. Liao, Q. Ma, and X. Chen, “Adaptive privacy budget allocation
+in federated learning: A multi-agent reinforcement learning approach,”IEEE,
+[18] S. Hafeez, S. R. Mulkana, M. A. Imran, and M. Sevegnani,Federated deep
+reinforcement learning for privacy-preserving robotic-assisted surgery, Unpub-
+lished manuscript.
+[19] S. Lu, R. Li, X. Chen, and Y. Ma,Defense against local model poisoning
+attacks to byzantine-robust federated learning, Technical report.
+[20] W. Zhou, T. Zhu, D. Ye, W. Ren, and K.-K. R. Choo, “A concurrent feder-
+ated reinforcement learning for iot resource allocation with local differential
+privacy,”IEEE,
+42
