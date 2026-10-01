@@ -66,6 +66,9 @@ def build_split():
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
+    # The original run never seeded torch (net init, randperm), so its cache is
+    # not reproducible. Seed from here on; the split itself was already seeded.
+    torch.manual_seed(SEED); np.random.seed(SEED)
     by_sess, counts, val_sess, clients, load = build_split()
     clear_sess = set(by_sess)
 
@@ -98,13 +101,29 @@ if __name__ == '__main__':
     pim, pobj, pbox = pim.to(DEV), pobj.to(DEV), pbox.to(DEV)
 
     # -- val, encoded once and subsampled ------------------------------------
-    vitems = []
+    vitems, vsess = [], []
     for s in val_sess:
         for f in by_sess[s]:
-            vitems.extend(load_folder(os.path.join(TRAIN_ROOT, f)))
+            its = load_folder(os.path.join(TRAIN_ROOT, f))
+            vitems.extend(its)
+            vsess.extend([s] * len(its))
     step = max(1, len(vitems) // VAL_TARGET)
     vitems = vitems[::step][:VAL_TARGET]
-    vim, vobj, vbox = encode(vitems)
+    vsess = vsess[::step][:VAL_TARGET]
+    # Encode per session so the session label of every cached val frame is known
+    # (encode() silently drops unreadable images, which would misalign a flat
+    # label list). Needed for the session-disjoint P3 detector/report split.
+    parts, val_frame_sessions = [], []
+    # NB the [:VAL_TARGET] truncation drops the tail: with 4 val sessions the last
+    # one contributes no frames. Kept as-is so val matches the original P3.
+    for s in val_sess:
+        sub = [it for it, ss in zip(vitems, vsess) if ss == s]
+        if not sub:
+            continue
+        e = encode(sub)
+        parts.append(e)
+        val_frame_sessions += [s] * e[0].shape[0]
+    vim, vobj, vbox = (torch.cat([p[k] for p in parts]) for k in range(3))
     print('  val: %d frames (every %dth from %d sessions)'
           % (vim.shape[0], step, len(val_sess)), flush=True)
 
@@ -167,7 +186,9 @@ if __name__ == '__main__':
 
     json.dump({'val_sessions': val_sess, 'client_sessions': clients,
                'public_folders': pub, 'n_per_client': int(n_eq),
-               'n_val': int(vim.shape[0])},
+               'n_val': int(vim.shape[0]),
+               'val_frame_sessions': val_frame_sessions,
+               'torch_seed': SEED, 'gpu': torch.cuda.get_device_name(0)},
               open(os.path.join(OUT, 'manifest.json'), 'w'), indent=1)
     print('\nSTAGE1-CLEAR DONE  (%d x %d train, %d val)'
           % (N_CLIENTS, n_eq, vim.shape[0]), flush=True)

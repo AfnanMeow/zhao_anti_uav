@@ -56,3 +56,8 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# ── machine-local run state ──────────────────────────────────────────────────
+.gpu_guard/
+*.pid
+p3_only/p3h_heterogeneous_sigma/results/ckpt_*.pt

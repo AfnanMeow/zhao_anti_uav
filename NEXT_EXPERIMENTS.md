@@ -338,3 +338,40 @@ Then the thesis edits follow mechanically:
   the mean), not to the batch average as currently written.
 * Terminology — "head" is used for both the 566,789-parameter DP block and the
   12,677-parameter layer. Pick one.
+
+---
+
+## 7. DEFERRED — rDP, the source paper's own defence (added 2026-10-01, NOT scheduled)
+
+**Status: not planned.** Run only if a reviewer or examiner asks why the source
+paper's defence was not evaluated. Until then the thesis must say plainly that
+rDP was **not** evaluated.
+
+**Why it is a gap.** In Hossain et al. (`exploiting_dp.pdf`, IEEE TAI 6(11), 2025)
+Norm / Accuracy / Mix are the detectors alpha-MPELM is designed to **evade** (we
+reproduced that). Their actual countermeasure is **rDP** (Section VI, Algorithm 3):
+a Q-learning agent that raises / lowers the privacy loss epsilon during training.
+All P3-H defences (Norm-sn, cosine, aggregators, Arm G) are ours, not theirs.
+
+**What rDP is (from the paper).**
+* State S = (m_l, f_l, epsilon): attacker's loss array, historical federated loss,
+  privacy-loss set. Actions: increase / decrease / keep epsilon, by 1 or 2 units.
+  Reward: minimise max attack accuracy while maximising federated accuracy,
+  within designer-set thresholds. Epsilon-greedy Q-learning.
+* **m_l is obtained "through a series of preconducted experiments" with the attack
+  itself** — rDP assumes the defender already knows the attack. State this as a
+  threat-model limitation in any write-up.
+
+**Predicted outcome, not tested.** rDP changes epsilon GLOBALLY (all clients),
+while P3-H shows detection depends on CROSS-CLIENT sigma differences, and our own
+converged DRL allocator collapsed to the uniform schedule. Expect rDP to trade
+accuracy for attack damage uniformly rather than to detect or exclude attackers.
+
+**If it is ever run — protocol sketch.** Pre-register first (PREREG_round5.md),
+same setup as rounds 1-4 (hetero sigma, m=3, 3 trials, 15 rounds, seeds 770000+t,
+session-disjoint split, `p3h.py`). Implement rDP as a global-sigma controller
+(epsilon -> sigma via the zCDP conversion used in §2b C6), with m_l from the round-3/4
+undefended runs. Attacks: alpha-MPELM, never-backing-off flip (`mpelm_fixed`),
+both onsets 0 and 5. Report damage vs clean, and the CLEAN-run accuracy cost of
+rDP (no attack). Compare against Cosine + Norm-sn, the best round-4 defence.
+Cost: ~half a day of code + ~2-3 h GPU on the 5090 (`code/launch.ps1`).

@@ -1,0 +1,85 @@
+==============================================================================
+ROUND-2 VERDICTS (rules: PREREG_round2.md)
+  P4  alpha-MPELM invisible to Norm & Norm-sn (hetero, adaptive)  : HELD
+  P5a lie=0.9 defeats Norm-sn (adaptive, no cap)                  : HELD
+  P5b tracking liar defeats Norm-sn; cap restores by >=0.30       : FAILED
+  P6  Arm G works under hetero (TPR>=0.90, FPR<=0.10)              : HELD
+  P7  Arm G degrades under adaptive                                : HELD
+  P8  band attacker: extra damage under Norm-raw (<=-0.010, 2/3)   : FAILED
+  P8b Norm-sn removes the extra damage (|diff|<=0.005)             : HELD
+============================================================================== 
+
+P8 paired damage diff hetero-uniform, Norm-raw : [0.0032, 0.0125, 0.0093]  mean +0.0084
+P8b                                   Norm-sn  : [-0.0035, 0.009, -0.0038]  mean +0.0006
+
+Arm G (per-client history, onset 5) TPR / FPR, vs cross-client detectors on the same runs:
+  uniform   ArmG 1.00 / 0.00 | Norm-raw 1.00 / 0.00 | Norm-sn 1.00 / 0.00
+  hetero    ArmG 1.00 / 0.00 | Norm-raw 0.11 / 0.19 | Norm-sn 1.00 / 0.00
+  adaptive  ArmG 0.66 / 0.71 | Norm-raw 0.06 / 0.13 | Norm-sn 1.00 / 0.00
+
+Defence grid (core): IoU.25, damage vs clean, TPR, FPR, honest-norm rsd raw / after /sigma
+config                                           acc   damage   TPR   FPR      rsd  rsd/sig
+adaptive|mpelm_scale|mix_sn|m3|lie1|cap0      0.4639  -0.0126  0.51  0.08   13.00%    0.20%
+adaptive|mpelm_scale|mix|m3|lie1|cap0         0.4655  -0.0110  0.24  0.08   13.00%    0.20%
+adaptive|mpelm_scale|none|m3|lie1|cap0        0.3082  -0.1684  0.00  0.00   12.89%    0.30%
+adaptive|mpelm_scale|norm_sn|m3|lie1|cap0     0.4639  -0.0126  0.51  0.08   13.00%    0.20%
+adaptive|mpelm_scale|norm|m3|lie1|cap0        0.4691  -0.0074  0.22  0.08   13.00%    0.20%
+adaptive|mpelm|mix_sn|m3|lie1|cap0            0.4496  -0.0269  0.15  0.12   12.99%    0.20%
+adaptive|mpelm|mix|m3|lie1|cap0               0.4503  -0.0262  0.11  0.15   13.00%    0.20%
+adaptive|mpelm|none|m3|lie1|cap0              0.4337  -0.0429  0.00  0.00   12.96%    0.22%
+adaptive|mpelm|norm_sn|m3|lie1|cap0           0.4555  -0.0210  0.14  0.13   12.99%    0.21%
+adaptive|mpelm|norm|m3|lie1|cap0              0.4503  -0.0262  0.11  0.15   13.00%    0.20%
+adaptive|none|none|m0|lie1|cap0               0.4765        -     -  0.00   12.52%    0.20%
+adaptive|rmd|mix_sn|m3|lie1|cap0              0.4842  +0.0077  1.00  0.02   13.01%    0.19%
+adaptive|rmd|mix|m3|lie1|cap0                 0.4694  -0.0071  0.09  0.13   13.00%    0.20%
+adaptive|rmd|none|m3|lie1|cap0                0.4689  -0.0076  0.00  0.00   13.00%    0.20%
+adaptive|rmd|norm_sn|m3|lie1|cap0             0.4838  +0.0073  1.00  0.02   13.01%    0.19%
+adaptive|rmd|norm|m3|lie1|cap0                0.4694  -0.0071  0.09  0.13   13.00%    0.20%
+hetero|mpelm_scale|mix_sn|m3|lie1|cap0        0.4673  -0.0096  0.52  0.09   10.39%    0.16%
+hetero|mpelm_scale|mix|m3|lie1|cap0           0.4702  -0.0067  0.36  0.10   10.39%    0.16%
+hetero|mpelm_scale|none|m3|lie1|cap0          0.3078  -0.1691  0.00  0.00   10.31%    0.23%
+hetero|mpelm_scale|norm_sn|m3|lie1|cap0       0.4673  -0.0096  0.52  0.09   10.39%    0.16%
+hetero|mpelm_scale|norm|m3|lie1|cap0          0.4751  -0.0018  0.35  0.11   10.38%    0.16%
+hetero|mpelm|mix_sn|m3|lie1|cap0              0.4659  -0.0110  0.16  0.12   10.39%    0.16%
+hetero|mpelm|mix|m3|lie1|cap0                 0.4559  -0.0210  0.24  0.26   10.39%    0.16%
+hetero|mpelm|none|m3|lie1|cap0                0.4339  -0.0430  0.00  0.00   10.36%    0.18%
+hetero|mpelm|norm_sn|m3|lie1|cap0             0.4641  -0.0128  0.11  0.11   10.38%    0.16%
+hetero|mpelm|norm|m3|lie1|cap0                0.4471  -0.0298  0.21  0.26   10.38%    0.17%
+hetero|none|none|m0|lie1|cap0                 0.4769        -     -  0.00   10.06%    0.16%
+hetero|rmd|mix_sn|m3|lie1|cap0                0.4816  +0.0047  1.00  0.01   10.39%    0.15%
+hetero|rmd|mix|m3|lie1|cap0                   0.4729  -0.0040  0.11  0.19   10.39%    0.16%
+hetero|rmd|none|m3|lie1|cap0                  0.4688  -0.0081  0.00  0.00   10.39%    0.16%
+hetero|rmd|norm_sn|m3|lie1|cap0               0.4816  +0.0047  1.00  0.01   10.39%    0.15%
+hetero|rmd|norm|m3|lie1|cap0                  0.4719  -0.0051  0.11  0.19   10.39%    0.16%
+uniform|mpelm_scale|mix_sn|m3|lie1|cap0       0.4654  -0.0102  0.53  0.08    0.11%    0.11%
+uniform|mpelm_scale|mix|m3|lie1|cap0          0.4654  -0.0102  0.53  0.08    0.11%    0.11%
+uniform|mpelm_scale|none|m3|lie1|cap0         0.3088  -0.1668  0.00  0.00    0.14%    0.14%
+uniform|mpelm_scale|norm_sn|m3|lie1|cap0      0.4654  -0.0102  0.53  0.08    0.11%    0.11%
+uniform|mpelm_scale|norm|m3|lie1|cap0         0.4654  -0.0102  0.53  0.08    0.11%    0.11%
+uniform|mpelm|mix_sn|m3|lie1|cap0             0.4692  -0.0064  0.19  0.14    0.11%    0.11%
+uniform|mpelm|mix|m3|lie1|cap0                0.4692  -0.0064  0.19  0.14    0.11%    0.11%
+uniform|mpelm|none|m3|lie1|cap0               0.4335  -0.0422  0.00  0.00    0.11%    0.11%
+uniform|mpelm|norm_sn|m3|lie1|cap0            0.4643  -0.0114  0.16  0.12    0.11%    0.11%
+uniform|mpelm|norm|m3|lie1|cap0               0.4643  -0.0114  0.16  0.12    0.11%    0.11%
+uniform|none|none|m0|lie1|cap0                0.4756        -     -  0.00    0.11%    0.11%
+uniform|rmd|mix_sn|m3|lie1|cap0               0.4796  +0.0040  1.00  0.01    0.11%    0.11%
+uniform|rmd|mix|m3|lie1|cap0                  0.4796  +0.0040  1.00  0.01    0.11%    0.11%
+uniform|rmd|none|m3|lie1|cap0                 0.4693  -0.0063  0.00  0.00    0.11%    0.11%
+uniform|rmd|norm_sn|m3|lie1|cap0              0.4796  +0.0040  1.00  0.01    0.11%    0.11%
+uniform|rmd|norm|m3|lie1|cap0                 0.4796  +0.0040  1.00  0.01    0.11%    0.11%
+
+Arm F (adaptive, Norm-sn):
+  adaptive|mpelm_scale|norm_sn|m3|lie1|cap0|track      acc 0.4624  TPR 0.15  FPR 0.14
+  adaptive|mpelm_scale|norm_sn|m3|lie1|cap1|track      acc 0.4623  TPR 0.24  FPR 0.13
+  adaptive|rmd|norm_sn|m3|lie0.8|cap0                  acc 0.4809  TPR 1.00  FPR 0.02
+  adaptive|rmd|norm_sn|m3|lie0.8|cap1                  acc 0.4809  TPR 1.00  FPR 0.02
+  adaptive|rmd|norm_sn|m3|lie0.9|cap0                  acc 0.4607  TPR 0.24  FPR 0.09
+  adaptive|rmd|norm_sn|m3|lie0.9|cap1                  acc 0.4607  TPR 0.24  FPR 0.09
+  adaptive|rmd|norm_sn|m3|lie1.1|cap0                  acc 0.4838  TPR 1.00  FPR 0.02
+  adaptive|rmd|norm_sn|m3|lie1.1|cap1                  acc 0.4838  TPR 1.00  FPR 0.02
+
+Sigma ladder (RMD, Norm-raw active; Norm-sn shadow):
+  ladder:0.05 sigma rsd   3.2% | honest-norm rsd   2.90% | Norm-raw TPR 0.15 FPR 0.06 | Norm-sn TPR 1.00 FPR 0.02
+  ladder:0.1 sigma rsd   6.4% | honest-norm rsd   5.82% | Norm-raw TPR 0.12 FPR 0.14 | Norm-sn TPR 1.00 FPR 0.02
+  ladder:0.2 sigma rsd  12.7% | honest-norm rsd  11.73% | Norm-raw TPR 0.00 FPR 0.05 | Norm-sn TPR 1.00 FPR 0.02
+  ladder:0.4 sigma rsd  25.4% | honest-norm rsd  23.73% | Norm-raw TPR 0.10 FPR 0.05 | Norm-sn TPR 0.98 FPR 0.01

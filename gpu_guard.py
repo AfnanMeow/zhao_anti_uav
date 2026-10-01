@@ -147,10 +147,87 @@ def power_limit_w():
 # it is absent (e.g. after a reboot -- persistence mode is unsupported on
 # Windows, so `nvidia-smi -pl` does NOT survive a restart) we clamp down hard
 # and say so loudly.
-_LIMIT = power_limit_w()
-_CAPPED = _LIMIT is not None and _LIMIT <= 350.0
+# ── shutdown detection (added 2026-09-30, RTX 5090 box) ──────────────────────
+# Every guarded process drops a marker holding the current boot time and deletes
+# it on normal exit. A marker from an EARLIER boot means the machine went down
+# while a run was live (power-off / outage), so the sticky SHUTDOWN_DETECTED
+# flag is set and all later runs use aggressive throttling until it is deleted.
+# Markers from the current boot (a killed or concurrent run) are ignored.
+import atexit, glob, json as _json
 
-if _CAPPED:
+_MARK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.gpu_guard')
+_SHUTDOWN_FLAG = os.path.join(_MARK_DIR, 'SHUTDOWN_DETECTED')
+
+
+def _boot_time():
+    return time.time() - time.monotonic()      # monotonic counts from boot on Windows
+
+
+def _pid_alive(pid):
+    if os.name != 'nt':
+        try:
+            os.kill(pid, 0); return True
+        except OSError:
+            return False
+    import ctypes                                   # never os.kill on Windows: it terminates
+    k32 = ctypes.windll.kernel32
+    h = k32.OpenProcess(0x1000, False, pid)         # PROCESS_QUERY_LIMITED_INFORMATION
+    if not h:
+        return False
+    code = ctypes.c_ulong()
+    k32.GetExitCodeProcess(h, ctypes.byref(code)); k32.CloseHandle(h)
+    return code.value == 259                        # STILL_ACTIVE
+
+
+def _check_and_mark():
+    os.makedirs(_MARK_DIR, exist_ok=True)
+    boot = _boot_time()
+    for f in glob.glob(os.path.join(_MARK_DIR, 'run_*.json')):
+        try:
+            old = _json.load(open(f))
+        except Exception:
+            old = {'boot': 0, 'started': '?'}
+        same_boot = abs(old.get('boot', 0) - boot) <= 120
+        if same_boot and not _pid_alive(int(os.path.basename(f)[4:-5])):
+            os.remove(f)                            # killed this boot, not a power loss
+        elif not same_boot:
+            with open(_SHUTDOWN_FLAG, 'a') as fh:
+                fh.write('run started %s died with the machine (marker %s)\n'
+                         % (old.get('started'), os.path.basename(f)))
+            os.remove(f)
+    mine = os.path.join(_MARK_DIR, 'run_%d.json' % os.getpid())
+    _json.dump({'boot': boot, 'started': time.strftime('%Y-%m-%d %H:%M:%S')}, open(mine, 'w'))
+    atexit.register(lambda: os.path.exists(mine) and os.remove(mine))
+    return os.path.exists(_SHUTDOWN_FLAG)
+
+
+_SHUTDOWN_SEEN = _check_and_mark()
+_LIMIT = power_limit_w()
+# 'Capped' = at or below GPU_CAPPED_AT watts (default 540 = 90% of the 5090's
+# 600 W). The lab RTX PRO 6000 used 300 W; its 350 threshold is still covered.
+_CAPPED = (_LIMIT is not None and _LIMIT <= float(os.environ.get('GPU_CAPPED_AT', 540))
+           and not _SHUTDOWN_SEEN)
+
+if _SHUTDOWN_SEEN:
+    print('=' * 72)
+    print('SHUTDOWN DETECTED: a previous run died with the machine.')
+    print('  Using aggressive software throttling from now on.')
+    print('  To go back to light mode, delete: %s' % _SHUTDOWN_FLAG)
+    print('=' * 72, flush=True)
+    _defaults = dict(target_util=60.0, max_power_w=300.0, max_temp_c=72.0)
+elif _CAPPED and _LIMIT > 350.0:
+    # Light mode for a 90% cap (user's choice, 2026-09-30): no duty cycling and
+    # no scheduled rests -- temperature ceiling only, as a safety net.
+    _defaults = dict(target_util=100.0, max_power_w=_LIMIT * 1.15, max_temp_c=83.0,
+                     rest_every_s=1e9)
+elif not _CAPPED and os.environ.get('GPU_SOFT_CAP'):
+    # No admin shell to set the driver cap: hold the same 90% ceiling in software.
+    # Full duty until draw exceeds the soft cap, then the closed loop cuts in.
+    _soft = float(os.environ['GPU_SOFT_CAP'])
+    print('gpu_guard: no driver cap (%s W); SOFTWARE cap %.0f W, light mode' % (_LIMIT, _soft),
+          flush=True)
+    _defaults = dict(target_util=100.0, max_power_w=_soft, max_temp_c=83.0, rest_every_s=1e9)
+elif _CAPPED:
     # With a driver cap the card SITS AT its cap under load by design, so a
     # software power ceiling near the cap fires continuously and throttles to the
     # floor -- measured: duty collapsed to 25%, sleeping 1114s of a 1560s trial.
@@ -161,7 +238,7 @@ else:
     print('=' * 72)
     print('WARNING: no driver power cap (limit = %s W).' % _LIMIT)
     print('  This machine hard-powers-off under sustained full GPU load.')
-    print('  Run in an ADMIN shell:   nvidia-smi -pl 300')
+    print('  Run in an ADMIN shell:   nvidia-smi -pl 540   (5090; lab card: -pl 300)')
     print('  A reboot resets it, so it must be re-applied after every restart.')
     print('  Falling back to aggressive software throttling (slower).')
     print('=' * 72, flush=True)
@@ -172,7 +249,7 @@ GUARD = GpuGuard(
     target_util=float(os.environ.get('GPU_TARGET_UTIL', _defaults['target_util'])),
     max_power_w=float(os.environ.get('GPU_MAX_POWER', _defaults['max_power_w'])),
     max_temp_c=float(os.environ.get('GPU_MAX_TEMP', _defaults['max_temp_c'])),
-    rest_every_s=float(os.environ.get('GPU_REST_EVERY', 600)),
+    rest_every_s=float(os.environ.get('GPU_REST_EVERY', _defaults.get('rest_every_s', 600))),
     rest_for_s=float(os.environ.get('GPU_REST_FOR', 45)),
 )
 

@@ -1,0 +1,88 @@
+==============================================================================
+ROUND-3 VERDICTS (rules: PREREG_round3.md)
+  P9  cos catches alpha-MPELM (TPR>=0.70, FPR<=0.10), all sigma : FAILED
+  P10 cos halves alpha-MPELM damage, all sigma                  : HELD
+  P11 cos costs <= 0.010 IoU on clean runs, all sigma           : HELD
+  P12 cos_sn no worse than best norm defence vs band attacker   : FAILED
+  P13 median costs >= 0.050 with no attack (P3 replication)     : HELD
+  R3-5 Mix discrepancy: accuracy-detector honest FPR on positional split = 0.180 -> LEAK (positional split causes the honest rejections)
+============================================================================== 
+
+Per-setting detail (damage = IoU.25 vs clean run, same sigma setting and trial):
+
+  attack = none
+    none     +0.0000   FPR 0.00       | +0.0000   FPR 0.00       | +0.0000   FPR 0.00      
+    norm                              - |                          - |                          -
+    norm_sn                           - |                          - |                          -
+    mix                               - |                          - |                          -
+    mix_sn                            - |                          - |                          -
+    cos      -0.0034   FPR 0.06       | -0.0004   FPR 0.05       | +0.0049   FPR 0.05      
+    cos_sn                            - |                          - |                          -
+    krum     -0.0819   FPR 0.90       | -0.0135   FPR 0.90       | +0.0193   FPR 0.90      
+    median   -0.1122   FPR 0.00       | -0.1063   FPR 0.00       | -0.1064   FPR 0.00      
+    trimmed  -0.0025   FPR 0.00       | -0.0023   FPR 0.00       | -0.0022   FPR 0.00      
+
+  attack = rmd
+    none     -0.0063                 | -0.0081                 | -0.0076                
+    norm     +0.0040 TPR 1.00 FPR 0.01 | -0.0051 TPR 0.11 FPR 0.19 | -0.0071 TPR 0.09 FPR 0.13
+    norm_sn  +0.0040 TPR 1.00 FPR 0.01 | +0.0047 TPR 1.00 FPR 0.01 | +0.0073 TPR 1.00 FPR 0.02
+    mix      +0.0040 TPR 1.00 FPR 0.01 | -0.0040 TPR 0.11 FPR 0.19 | -0.0071 TPR 0.09 FPR 0.13
+    mix_sn   +0.0040 TPR 1.00 FPR 0.01 | +0.0047 TPR 1.00 FPR 0.01 | +0.0077 TPR 1.00 FPR 0.02
+    cos      +0.0052 TPR 0.21 FPR 0.02 | +0.0035 TPR 0.19 FPR 0.02 | +0.0040 TPR 0.17 FPR 0.02
+    cos_sn   +0.0028 TPR 1.00 FPR 0.02 | +0.0049 TPR 1.00 FPR 0.03 | +0.0088 TPR 1.00 FPR 0.03
+    krum     -0.0870 TPR 0.67 FPR 1.00 | -0.0591 TPR 0.67 FPR 1.00 | -0.0052 TPR 0.76 FPR 0.96
+    median   -0.1263 TPR 0.00 FPR 0.00 | -0.1185 TPR 0.00 FPR 0.00 | -0.1211 TPR 0.00 FPR 0.00
+    trimmed  -0.0093 TPR 0.00 FPR 0.00 | -0.0092 TPR 0.00 FPR 0.00 | -0.0100 TPR 0.00 FPR 0.00
+
+  attack = mpelm
+    none     -0.0422                 | -0.0430                 | -0.0429                
+    norm     -0.0114 TPR 0.16 FPR 0.12 | -0.0298 TPR 0.21 FPR 0.26 | -0.0262 TPR 0.11 FPR 0.15
+    norm_sn  -0.0114 TPR 0.16 FPR 0.12 | -0.0128 TPR 0.11 FPR 0.11 | -0.0210 TPR 0.14 FPR 0.13
+    mix      -0.0064 TPR 0.19 FPR 0.14 | -0.0210 TPR 0.24 FPR 0.26 | -0.0262 TPR 0.11 FPR 0.15
+    mix_sn   -0.0064 TPR 0.19 FPR 0.14 | -0.0110 TPR 0.16 FPR 0.12 | -0.0269 TPR 0.15 FPR 0.12
+    cos      +0.0092 TPR 0.13 FPR 0.06 | +0.0089 TPR 0.14 FPR 0.05 | +0.0121 TPR 0.14 FPR 0.04
+    cos_sn   +0.0007 TPR 0.21 FPR 0.18 | +0.0017 TPR 0.25 FPR 0.18 | +0.0017 TPR 0.21 FPR 0.16
+    krum     -0.0396 TPR 0.92 FPR 0.89 | -0.0135 TPR 1.00 FPR 0.86 | +0.0167 TPR 1.00 FPR 0.86
+    median   -0.1917 TPR 0.00 FPR 0.00 | -0.1808 TPR 0.00 FPR 0.00 | -0.1813 TPR 0.00 FPR 0.00
+    trimmed  -0.0485 TPR 0.00 FPR 0.00 | -0.0490 TPR 0.00 FPR 0.00 | -0.0487 TPR 0.00 FPR 0.00
+
+  attack = mpelm_scale
+    none     -0.1668                 | -0.1691                 | -0.1684                
+    norm     -0.0102 TPR 0.53 FPR 0.08 | -0.0018 TPR 0.35 FPR 0.11 | -0.0074 TPR 0.22 FPR 0.08
+    norm_sn  -0.0102 TPR 0.53 FPR 0.08 | -0.0096 TPR 0.52 FPR 0.09 | -0.0126 TPR 0.51 FPR 0.08
+    mix      -0.0102 TPR 0.53 FPR 0.08 | -0.0067 TPR 0.36 FPR 0.10 | -0.0110 TPR 0.24 FPR 0.08
+    mix_sn   -0.0102 TPR 0.53 FPR 0.08 | -0.0096 TPR 0.52 FPR 0.09 | -0.0126 TPR 0.51 FPR 0.08
+    cos      -0.0045 TPR 0.14 FPR 0.05 | -0.0085 TPR 0.13 FPR 0.05 | +0.0105 TPR 0.14 FPR 0.06
+    cos_sn   +0.0064 TPR 0.56 FPR 0.14 | +0.0089 TPR 0.57 FPR 0.13 | -0.0034 TPR 0.54 FPR 0.15
+    krum     -0.0380 TPR 0.92 FPR 0.89 | -0.0135 TPR 1.00 FPR 0.86 | +0.0167 TPR 1.00 FPR 0.86
+    median   -0.2714 TPR 0.00 FPR 0.00 | -0.2528 TPR 0.00 FPR 0.00 | -0.2538 TPR 0.00 FPR 0.00
+    trimmed  -0.0455 TPR 0.00 FPR 0.00 | -0.0477 TPR 0.00 FPR 0.00 | -0.0481 TPR 0.00 FPR 0.00
+    columns: uniform | hetero | adaptive
+
+Cosine statistic, honest vs malicious (mean c_i over all rounds, cos runs):
+  uniform   rmd          honest 0.0153 +- 0.0371 | malicious 0.0095 +- 0.0221
+  uniform   mpelm        honest 0.0137 +- 0.0308 | malicious 0.0058 +- 0.0084
+  uniform   mpelm_scale  honest 0.0133 +- 0.0309 | malicious 0.0053 +- 0.0085
+  hetero    rmd          honest 0.0158 +- 0.0384 | malicious 0.0097 +- 0.0223
+  hetero    mpelm        honest 0.0141 +- 0.0319 | malicious 0.0059 +- 0.0087
+  hetero    mpelm_scale  honest 0.0138 +- 0.0320 | malicious 0.0058 +- 0.0087
+  adaptive  rmd          honest 0.0157 +- 0.0381 | malicious 0.0096 +- 0.0219
+  adaptive  mpelm        honest 0.0139 +- 0.0314 | malicious 0.0059 +- 0.0086
+  adaptive  mpelm_scale  honest 0.0136 +- 0.0315 | malicious 0.0055 +- 0.0087
+
+R3-4 Arm G vs clean-window length (hetero):
+  hetero|mpelm_scale|none|m3|lie1|cap0|on5      onset 5: TPR 0.90 FPR 0.00
+  hetero|rmd|none|m3|lie1|cap0|on2              onset 2: TPR 1.00 FPR 0.00
+  hetero|rmd|none|m3|lie1|cap0|on3              onset 3: TPR 1.00 FPR 0.00
+  hetero|rmd|none|m3|lie1|cap0|on5              onset 5: TPR 1.00 FPR 0.00
+  hetero|rmd|none|m3|lie1|cap0|on8              onset 8: TPR 1.00 FPR 0.00
+
+R3-3 damage vs sigma spread (band attacker; damage vs clean at the same level):
+  ladder:0.05  none -0.1674 | norm -0.0072 | norm_sn -0.0105
+  ladder:0.1   none -0.1678 | norm -0.0042 | norm_sn -0.0061
+  ladder:0.2   none -0.1680 | norm -0.0034 | norm_sn -0.0055
+  ladder:0.4   none -0.1686 | norm -0.0027 | norm_sn -0.0089
+
+R3-5 detail (positional split, uniform):
+  uniform|mpelm|mix|m3|lie1|cap0           IoU 0.6574  active TPR/FPR 0.27/0.26  accuracy-detector alone TPR/FPR 0.12/0.13
+  uniform|none|mix|m0|lie1|cap0            IoU 0.6588  active TPR/FPR nan/0.30  accuracy-detector alone TPR/FPR nan/0.18

@@ -27,6 +27,48 @@ share, so every run inherits it. Tunable via GPU_TARGET_UTIL / GPU_MAX_POWER /
 GPU_MAX_TEMP env vars. Throttling is numerically neutral (sleeps only) —
 verified by identical results with and without it.
 
+## ⚠ 2026-10-01 — P3-H ROUND 4 (36 runs): direction attacks at convergence are OPEN
+
+`p3_only/p3h_heterogeneous_sigma/FINDINGS_P3H_round4.md`. Against a flip attacker
+that never backs off, cosine catches all 3 in rounds 1-5 then goes blind as the
+gradient signal dies; damage only -0.041 -> -0.029 (P14/P15/P17 failed). Only the
+backing-off α-MPELM is largely stopped (P16 held, marginal). Do NOT claim α-MPELM
+is solved: the cosine detector is a partial, early-training defence.
+
+## ⚠ 2026-10-01 — P3-H ROUND 3 COMPLETE (240 runs): cosine detector, aggregators, split leak
+
+Read **`p3_only/p3h_heterogeneous_sigma/FINDINGS_P3H_round3.md`** (prereg
+`PREREG_round3.md`). Cosine (direction) detector: P9 FAILED (TPR 0.14 vs α-MPELM)
+but P10 HELD (damage -0.043 -> ~+0.01) — it works by DETERRENCE: catches all
+attackers in round 1, α-MPELM's back-off keeps γ<0.5 after. The direction signal
+dies by round ~5, so a non-backing-off or late-onset attacker is untested and likely
+evades it. Median costs -0.11 even without attack (P13). Arm G needs only 2 clean
+rounds. Positional split confirmed as the cause of the old Mix/accuracy-detector
+results, and of the 0.47 vs 0.65 IoU gap (report set, not the trunk).
+
+## ⚠ 2026-10-01 — P3-H ROUND 2 COMPLETE (150 runs): DETECTION RESULT, NO DAMAGE RESULT
+
+Read **`p3_only/p3h_heterogeneous_sigma/FINDINGS_P3H_round2.md`** (supersedes the
+decisive section below for everything except P1-P3). Pre-registered in
+`PREREG_round2.md`. P4, P5a, P6, P7 held; **P5b and P8 failed** — heterogeneous σ
+does not increase damage (twice now), so the damage claim is dropped for good.
+Story: per-client history detection works under constant σ (1.00/0.00) but adaptive
+allocation breaks it (0.66/0.71 FPR), forcing trust in declared σ, which a matched
+liar defeats (1.00 -> 0.24). Accuracy detector is silent on the clean split, so the
+original P3 "Mix neutralises α-MPELM" does NOT reproduce. Figures: `figD1`, `figD2`,
+`figH1`-`figH3` + `defence_summary.csv` in `p3_only/p3h_heterogeneous_sigma/figures/`.
+
+## ⚠ 2026-09-30 — P3-H DECISIVE SUBSET RUN: P1 HELD, P2 FAILED, P3 HELD
+
+Read **`p3_only/p3h_heterogeneous_sigma/FINDINGS_P3H_decisive.md`**. 21 runs on the
+5090. Heterogeneous budgets widen the honest-norm band 0.11% -> 10.1% and drop
+Norm-raw TPR 1.00 -> 0.11; sigma-normalisation restores it to 1.00. But undefended
+RMD damage does NOT grow (-0.0081 vs -0.0063, paired diff ~0). **Per the
+pre-registered rule the reframe fails; the full grid was not run.** §9's fallback
+applies: a detection result only. Code: `p3_only/p3h_heterogeneous_sigma/code/`
+(`p3h.py` resumes per round; `launch.ps1` runs detached). The Stage-1 cache was
+rebuilt (seeded) on the 5090 — absolute IoU.25 ~0.47, not ~0.65.
+
 ## PROPOSED REFOCUS — `p3_only/` (2026-09-25, PLAN ONLY)
 
 All P3-track material lives in **`p3_only/`**. Start with `p3_only/README.md`.
